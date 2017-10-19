@@ -1,0 +1,9 @@
+<div class="view">
+    <div ng-if="state.test">
+        <div ng-include="'components/testing/selected/test.html'"></div>
+    </div>
+    <div ng-if="!state.test" class="main">
+        <h1>No File Selected</h1>
+        <p class="no-content">Please select a specification file from the sidebar</p>
+    </div>
+</div>

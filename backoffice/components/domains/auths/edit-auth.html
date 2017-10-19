@@ -1,0 +1,8 @@
+<modal class="form" title="Edit Authentication" show="show" visible="visible" no-close>
+    <div ng-if="visible">
+        <div ng-include="'components/domains/auths/auth-form.html'"></div>
+    </div>
+    <menu>
+        <button class="cancel" ng-touch="cancel()">Cancel</button>
+    </menu>
+</modal>

@@ -1,0 +1,127 @@
+<div class="main view" ng-controller="DependencyCtrl">
+    <h1>{{state.driver.name}}
+
+        <menu ng-if="currentUser.sys_admin">
+            <span role="button" class="pe-7s-pen"
+                edit-dep show="show_dep_edit"
+                dep="state.driver"
+                on-save="editDepCB"
+                ng-touch="show_dep_edit = true">
+            </span>
+            <span role="button" class="pe-7s-trash"
+                confirm-dialog show="confirm_dep_delete"
+                model="state.driver"
+                confirm="deleteDepCB"
+                title="Delete Driver?"
+                ng-touch="confirm_dep_delete = true"
+            >
+                <p>All devices that depend on this driver will be immediately removed.</p>
+            </span>
+        </menu>
+    </h1>
+    <tabs current="state.tab" auto-select="false">
+        <pane icon="about" text="<span>About</span>" name="'about'">
+            <!--
+                TODO::
+                    Display a list of settings here
+             -->
+            <p class="description cleanslate" markdown-to-html="state.driver.description || ''"></p>
+            <br />
+
+            <table>
+                <tr>
+                    <th>Module name:</th>
+                    <th>Class:</th>
+                </tr>
+                <tr>
+                    <td>{{state.driver.module_name}}</td>
+                    <td>{{state.driver.class_name}}</td>
+                </tr>
+            </table>
+
+            <div ng-if="state.driver.role !== 'logic'">
+                <br />
+                <b>Default data:</b>
+                <span>{{state.driver.default || 'none'}}</span>
+                <br />
+            </div>
+            
+            <br />
+            <b>Settings</b>
+            <p class="code" ng-bind-html="printSettings(settings) | newlines"></p>
+            <br />
+            <br />
+            <button ng-if="currentUser.sys_admin" ng-click="confirm_reload_dep = true">
+                Reload Modules
+                <span
+                    confirm-dialog show="confirm_reload_dep"
+                    model="state.driver.id"
+                    confirm="reloadDep"
+                    title="Reload Driver?"
+                >
+                    <p>New driver code will be loaded and device settings will be reloaded.</p>
+                </span>
+            </button>
+        </pane>
+
+        <pane icon="modules" text="<span>Devices</span> ({{modulesTotal}})" name="'devices'">
+            <input 
+                ng-model="state.moduleFilter"
+                placeholder="Filter Devices"
+                type="text"
+
+                ng-touch="$event.stopPropagation()"
+                user-select="true" 
+                no-capture
+            >
+            <table ng-show="state.modules.length > 0"
+                infinite-scroll="moreModules()"
+                infinite-scroll-disabled="modulesLoading"
+                infinite-scroll-distance="0.4"
+            >
+                <tr>
+                    <th class="connected"></th>
+                    <th>Name</th> <!-- TODO:: add indicators for UDP, Makebreak and TLS if device module -->
+                    <th>
+                        <span ng-if="state.driver.role !== 'logic'">IP</span>
+                        <span ng-if="state.driver.role === 'logic'">System</span>
+                    </th>
+                    <th ng-if="state.driver.role === 'device'">Port</th>
+                    <th ng-if="currentUser.sys_admin" class="remove" style="width: 7.5em;"></th>
+                </tr>
+                <tr ng-repeat="module in state.modules track by module.id">
+                    <td>
+                        <div ng-class="{online: module.connected, offline: !module.connected}">
+                        </div>
+                    </td>
+                    <td><a goto="modules" search="{module: module.id}">{{module.custom_name || state.driver.module_name}}</a></td>
+                    <td>
+                        <a ng-if="module.role !== 3" ng-href="{{buildModuleLink(module)}}" target="_blank">
+                            {{module.ip || module.uri}}
+                        </a>
+                        <a ng-if="module.role === 3" goto="systems" search="{system: module.control_system_id}">
+                            {{module.control_system.name}} ({{module.control_system_id}})
+                        </a>
+                    </td>
+                    <td ng-if="state.driver.role === 'device'">
+                        {{module.port}}
+                    </td>
+                    <td ng-if="currentUser.sys_admin" class="remove">
+                        <button ng-click="confirm_delete_device = true">
+                            Delete
+                            <span
+                                confirm-dialog show="confirm_delete_device"
+                                model="module"
+                                confirm="removeModule"
+                                title="Delete Device?"
+                            >
+                                <p>The device will be removed from all systems immediately.</p>
+                            </span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <p ng-if="state.modules.length == 0">No devices found. <span ng-if="state.moduleFilter.length > 0">Try adjusting the filter</span></p>
+        </pane>
+    </tabs>
+</div>

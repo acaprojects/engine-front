@@ -1,0 +1,128 @@
+
+<validated-form ng-if="auth.type == 'oauths'" submit-fn="save" model="auth">
+    <!-- Name and Site details -->
+    <form-field model="name"></form-field>
+    <div class="half-width">
+        <form-field model="site"></form-field>
+    </div>
+    <div class="half-width">
+        <form-field model="scope"></form-field>
+    </div>
+
+    <!-- Name and Site details -->
+    <div class="half-width">
+        <form-field model="client_id" label="Client ID"></form-field>
+    </div>
+    <div class="half-width">
+        <form-field model="client_secret"></form-field>
+    </div>
+
+    <!-- Primary URLs -->
+    <div class="half-width">
+        <form-field model="authorize_url" label="Authorize URL"></form-field>
+    </div>
+    <div class="half-width">
+        <form-field model="raw_info_url" label="Account Info URL"></form-field>
+    </div>
+
+    <form-json-area model="info_mappings"></form-json-area>
+
+    <!-- Optional Settings -->
+    <div class="half-width">
+        <form-field model="token_method"></form-field>
+    </div>
+    <div class="half-width">
+        <form-field model="auth_scheme"></form-field>
+    </div>
+    <div style="clear: both"></div>
+
+    <form-actions>
+        <form-submit>Save</form-submit>
+    </form-actions>
+</validated-form>
+
+<validated-form ng-if="auth.type == 'adfs'" submit-fn="save" model="auth">
+    <!-- Name and Issuer details -->
+    <div class="half-width">
+        <form-field model="name"></form-field>
+    </div>
+    <div class="half-width">
+        <form-field model="issuer"></form-field>
+    </div>
+    
+    <div class="half-width">
+        <form-field model="idp_sso_target_url" label="IDP Target URL"></form-field>
+    </div>
+    <div class="half-width">
+        <form-field model="name_identifier_format" label="Name Identifier Format"></form-field>
+    </div>
+
+    <form-json-area model="idp_sso_target_url_runtime_params" label="Claim Mappings"></form-json-area>
+
+    <div class="half-width">
+        <form-field model="assertion_consumer_service_url" label="Assertion URL"></form-field>
+    </div>
+    <div class="half-width">
+        <form-field model="idp_cert_fingerprint" label="Certificate Fingerprint"></form-field>
+    </div>
+
+    <div style="clear: both"></div>
+    <form-text-area model="idp_cert" label="Full Certificate"></form-text-area>
+
+    <!-- Optional Settings -->
+    <form-field model="attribute_service_name" label="Attribute Service Name"></form-field>
+    <div class="half-width">
+        <form-json-area model="attribute_statements"></form-json-area>
+    </div>
+    <div class="half-width">
+        <form-json-area model="request_attributes"></form-json-area>
+    </div>
+
+    <div class="half-width">
+        <form-field model="idp_slo_target_url" label="IDP SLO Target URL"></form-field>
+    </div>
+    <div class="half-width">
+        <form-field model="slo_default_relay_state" label="SLO Default Relay State"></form-field>
+    </div>
+    
+    <div style="clear: both"></div>
+    <form-actions>
+        <form-submit>Save</form-submit>
+    </form-actions>
+</validated-form>
+
+<validated-form ng-if="auth.type == 'ldaps'" submit-fn="save" model="auth">
+    <!-- Name and Site details -->
+    <form-field model="name"></form-field>
+    <div class="half-width">
+        <form-field model="port"></form-field>
+    </div>
+    <div class="half-width">
+        <form-field model="auth_method"></form-field>
+    </div>
+    <div class="half-width">
+        <form-field model="uid" label="User ID Key"></form-field>
+    </div>
+    <div class="half-width">
+        <form-field model="host"></form-field>
+    </div>
+    <div class="half-width">
+        <form-field model="base"></form-field>
+    </div>
+    <div class="half-width">
+        <form-field model="bind_dn" label="Bind DN"></form-field>
+    </div>
+    <div class="half-width">
+        <form-field model="password"></form-field>
+    </div>
+    <div class="half-width">
+        <form-field model="filter"></form-field>
+    </div>
+
+
+    <div style="clear: both"></div>
+    <form-actions>
+        <form-submit>Save</form-submit>
+    </form-actions>
+</validated-form>
+

@@ -1,0 +1,159 @@
+<div class="main view" ng-controller="DomainCtrl">
+    <h1>{{state.domain.name}} ({{state.domain.dom}})
+
+        <menu ng-if="currentUser.sys_admin">
+            <span role="button" class="pe-7s-pen"
+                edit-domain show="show_domain_edit"
+                domain="state.domain"
+                on-save="editDomainCB"
+                ng-touch="show_domain_edit = true">
+            </span>
+            <span role="button" class="pe-7s-trash"
+                confirm-dialog show="confirm_domain_delete"
+                model="state.domain"
+                confirm="deleteDomainCB"
+                title="Delete Domain?"
+                ng-touch="confirm_domain_delete = true"
+            >
+                <p>The domain will be removed immediately.</p>
+            </span>
+        </menu>
+    </h1>
+    <p class="description cleanslate" ng-if="state.domain.description && state.domain.description !== ''"
+        style="margin-left: 2.5em!important; margin-top: -2em!important; margin-bottom: 2em!important;"
+    markdown-to-html="state.domain.description || ''"></p>
+
+    <tabs current="state.tab" auto-select="false">
+        <pane icon="applications" text="<span>Applications</span> ({{domappsTotal}})" name="'applications'">
+            <button ng-touch="show_new_app = true">
+                Add New
+                <span new-app
+                    show="show_new_app"
+                    on-create="newAppCB"
+                    domain="state.domain"
+                >
+                </span>
+            </button>
+
+            <table ng-show="state.domapps.length > 0" style="margin-top: 1em"
+                infinite-scroll="moreLogs()"
+                infinite-scroll-disabled="domappsLoading"
+                infinite-scroll-distance="0.4"
+            >
+                <tr>
+                    <th style="min-width: 8em">Name</th>
+                    <th>Redirect</th>
+                    <th>Scopes</th>
+                    <th></th>
+                </tr>
+                <tr ng-repeat="domapp in state.domapps | orderBy:'name' track by domapp.id">
+                    <td>{{domapp.name}}</td>
+                    <td>{{domapp.redirect_uri}}</td>
+                    <td>{{domapp.scopes}}</td>
+                    <td style="font-size: 22px; white-space: nowrap;">
+                        <span role="button" class="pe-7s-pen"
+                            edit-app show="show_domain_edit"
+                            application="domapp"
+                            domain="state.domain"
+                            ng-touch="show_domain_edit = true">
+                        </span>
+                        &nbsp;
+                        <span
+                            role="button"
+                            class="pe-7s-trash"
+                            confirm-dialog show="confirm_app_delete"
+                            model="domapp"
+                            confirm="deleteAppCB"
+                            title="Delete Application?"
+                            ng-touch="confirm_app_delete = true"
+                        >
+                            <p>
+                                Delete application {{domapp.name}}?<br />
+                                <br />
+                                Redirect URI: <b>{{domapp.redirect_uri}}</b><br />
+                                Scopes: <b>{{domapp.scopes}}</b><br />
+                                <br />
+                                Configuration will be updated immediately.
+                            </p>
+                        </span>
+                        &nbsp;
+                    </td>
+                </tr>
+            </table>
+            <p ng-if="state.domapps.length == 0" style="margin-top: 1em">No applications found.</p>
+        </pane>
+
+        <pane icon="authentication" text="<span>Authentication</span> ({{authsourcesTotal}})" name="'authentication'">
+            <button ng-touch="show_new_auth = true">
+                Add New
+                <span new-auth
+                    show="show_new_auth"
+                    on-create="newAuthCB"
+                    domain="state.domain"
+                >
+                </span>
+            </button>
+
+            <table ng-show="state.auths.length > 0" style="margin-top: 1em"
+                infinite-scroll="moreAuths()"
+                infinite-scroll-disabled="authsourcesLoading"
+                infinite-scroll-distance="0.4"
+            >
+                <tr>
+                    <th>Name</th>
+                    <th>URL</th>
+                    <th></th>
+                </tr>
+                <tr ng-repeat="auth in state.auths | orderBy:'name' track by auth.id">
+                    <td>{{auth.name}}</td>
+                    <td><a target="_blank" ng-href="{{auth.auth_url_actual}}">{{auth.auth_url_actual}}</a></td>
+                    <td style="font-size: 22px; white-space: nowrap;">
+                        <span role="button" class="pe-7s-pen"
+                            edit-auth show="show_auth_edit"
+                            auth="auth"
+                            on-save="updatedAuthCB"
+                            ng-touch="show_auth_edit = true">
+                        </span>
+                        &nbsp;
+                        <span
+                            role="button"
+                            class="pe-7s-trash"
+                            confirm-dialog show="confirm_auth_delete"
+                            model="auth"
+                            confirm="deleteAuthCB"
+                            title="Delete Authentication?"
+                            ng-touch="confirm_auth_delete = true"
+                        >
+                            <p>
+                                Delete authentication source {{auth.name}}?<br />
+                                Configuration will be updated immediately.
+                            </p>
+                        </span>
+                        &nbsp;
+                    </td>
+                </tr>
+            </table>
+            <p ng-if="state.auths.length == 0" style="margin-top: 1em">No authentication sources found.</p>
+        </pane>
+
+        <pane icon="users" text="<span>Users</span> ({{usersTotal}})" name="'users'">
+            <table ng-show="state.users.length > 0"
+                infinite-scroll="moreUsers()"
+                infinite-scroll-disabled="usersLoading"
+                infinite-scroll-distance="0.4"
+            >
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Access</th>
+                </tr>
+                <tr ng-repeat="user in state.users | orderBy:'name' track by user.id">
+                    <td>{{user.name}}</td>
+                    <td>{{user.email}}</td>
+                    <td>{{user.sys_admin ? 'admin' : (user.support ? 'support' : '')}}</td>
+                </tr>
+            </table>
+            <p ng-if="state.users.length == 0">No users found.</p>
+        </pane>
+    </tabs>
+</div>

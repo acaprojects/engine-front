@@ -1,0 +1,362 @@
+<div class="main view systems" ng-controller="SystemCtrl">
+    <h1>
+        {{system.name}} ({{system.id}})
+        <menu ng-if="currentUser.sys_admin">
+            <span role="button" class="pe-7s-pen"
+                edit-system show="show_system_edit"
+                system="state.system"
+                on-save="editSystemCB"
+                ng-touch="show_system_edit = true">
+            </span>
+            <span role="button" class="pe-7s-trash"
+                confirm-dialog show="confirm_system_delete"
+                model="state.system"
+                confirm="deleteSystemCB"
+                title="Delete System"
+                ng-touch="confirm_system_delete = true"
+            >
+                <p>Deleting this system will <b>immediately</b> delete modules that are in no other systems.</p>
+            </span>
+        </menu>
+    </h1>
+    <tabs current="state.tab" auto-select="false">
+        <pane icon="about" text="<span>About</span>" name="'about'">
+            <p>
+                <span ng-if="system.support_url">
+                    <b>Support URL:</b> <a target="_blank" ng-href="{{system.support_url}}">{{system.support_url}}</a>
+                    <br />
+                </span>
+                <span ng-if="system.installed_ui_devices > 0">
+                    Touch Panels Installed: {{system.installed_ui_devices}}
+                    <br />
+                </span>
+                <span ng-if="system.bookable">
+                    Bookable Room<span ng-show="system.email"> ({{system.email}})</span>, capacity: {{system.capacity}}
+                    <br />
+                </span>
+            </p>
+            <br />
+            <b>Execute Command</b>
+            <p ng-touch="$event.stopPropagation()" user-select="true" no-capture>
+                <select
+                    ng-model="view.cmd.module_selected"
+                    ng-options="key as mod.display for (key, mod) in view.accessors"
+                >
+                    <option value="">select a device</option>
+                </select>
+                <select
+                    ng-if="view.cmd.func_list"
+                    ng-model="view.cmd.func"
+                    ng-options="func for func in view.cmd.func_list"
+                >
+                    <option value="">select a function</option>
+                </select>
+                <span ng-if="view.cmd.func">
+                    (<input ng-if="view.cmd.placeholder.length > 0" placeholder="{{view.cmd.placeholder}}" type="text" ng-model="view.cmd.func_args"></input>)
+                    <button ng-click="exec_cmd()" ng-if="view.cmd.valid_args">Send</button>
+                </span>
+            </p>
+            <br />
+            <p class="description cleanslate" markdown-to-html="system.description || ''"></p>
+            <br />
+            <b>Settings</b> (including those inherited from zones)
+            <p class="code" ng-bind-html="printSettings(view.allSettings) | newlines"></p>
+            <br />
+            <br />
+            <button ng-if="currentUser.sys_admin" ng-click="confirm_system_start = true">
+                Start System
+                <span
+                    confirm-dialog show="confirm_system_start"
+                    model="state.system"
+                    confirm="startSystem"
+                    title="Start System?"
+                >
+                    <p>Are you sure you want to start this system?<br />
+                    All stopped modules within the system will boot up.</p>
+                </span>
+            </button>
+            <button ng-if="currentUser.sys_admin" ng-click="confirm_system_stop = true">
+                Stop System
+                <span
+                    confirm-dialog show="confirm_system_stop"
+                    model="state.system"
+                    confirm="stopSystem"
+                    title="Stop System?"
+                >
+                    <p>Are you sure you want to stop this system?<br />
+                    All modules will be immediately unloaded regardless of any other systems they may be in.</p>
+                </span>
+            </button>
+            <button ng-if="currentUser.sys_admin" ng-click="request_access_logs()">
+                Access Logs
+            </button>
+        </pane>
+
+        <pane icon="modules" text="<span>Devices</span> ({{view.modules.length}})" name="'devices'">
+            <button ng-if="currentUser.sys_admin" ng-click="show_new_module = true">
+                Add New
+                <span new-module
+                    show="show_new_module"
+                    on-create="newModuleCB"
+                    system="system"
+                >
+                </span>
+            </button>
+            <button ng-if="currentUser.sys_admin" ng-click="show_add_module = true">
+                Add Existing
+                <span
+                    confirm-dialog show="show_add_module"
+                    model="state.add_module_id"
+                    confirm="addModule"
+                    title="Add Existing Device"
+                >
+                    <p>Select a device to add to this system<br />
+                    <search-select model="state.add_module_id" source="Module" text-val="module_description" options="{query:{no_logic: true}}" placeholder="Select a Module"></search-select></p>
+                </span>
+            </button>
+            <span confirm-dialog show="state.confirm_module_order"
+                model="state.system"
+                confirm="updateModuleOrder"
+                cancel="undoOrder"
+                title="Change Order?"
+            >
+                <p>
+                    Are you sure you want to change module priority?<br />
+                    Settings will be updated immediately for the system.
+                </p>
+            </span>
+
+            <br /> <br />
+            <p ng-show="view.modules.length == 0">No devices in this system.</p>
+        </pane>
+
+        <pane icon="zones" text="<span>Zones</span> ({{view.zones.length}})" name="'zones'">
+            <button ng-if="currentUser.sys_admin" ng-click="show_add_zone = true">
+                Join Existing
+                <span
+                    confirm-dialog show="show_add_zone"
+                    model="state.add_zone_id"
+                    confirm="addZone"
+                    title="Add Zone"
+                >
+                    <p>Select a zone for this system to join<br />
+                    <search-select model="state.add_zone_id" source="Zone" placeholder="Select a Zone"></search-select></p>
+                </span>
+            </button>
+            <br /> <br />
+
+            <span confirm-dialog show="state.confirm_zone_order"
+                model="state.system"
+                confirm="updateZoneOrder"
+                cancel="undoOrder"
+                title="Change Order?"
+            >
+                <p>
+                    Are you sure you want to change zone priority?<br />
+                    Settings will be updated immediately for the system.
+                </p>
+            </span>
+            <!-- NOTE:: Every system is in at least one zone -->
+            <table>
+                <thead>
+                    <tr>
+                        <th ng-if="currentUser.sys_admin"></th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th ng-if="currentUser.sys_admin" class="remove" style="width: 6.5em;"></th>
+                    </tr>
+                </thead>
+                <tbody ui-sortable="zoneSortOptions" ng-model="view.zones">
+                    <tr ng-repeat="zone in view.zones track by zone.id">
+                        <td ng-if="currentUser.sys_admin" class="drag-handle drag-keep"></td>
+                        <td class="drag-keep">
+                            <a goto="zones" search="{zone: zone.id}">{{zone.name}}</a>
+                        </td>
+                        <td>{{zone.description | limitTo : 60}}</td>
+                        <td ng-if="currentUser.sys_admin" class="remove">
+                            <button ng-if="view.zones.length > 1" ng-click="confirm_remove_zone = true">
+                                Leave
+                                <span
+                                    confirm-dialog show="confirm_remove_zone"
+                                    model="zone"
+                                    confirm="removeZone"
+                                    title="Remove Zone?"
+                                >
+                                    <p>Remove system from zone {{zone.name}}?<br />
+                                    Configuration will be updated immediately.</p>
+                                </span>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </pane>
+        <pane icon="triggers" text="<span>Triggers</span> ({{state.triggers.length}})" name="'triggers'">
+            <button ng-if="currentUser.sys_admin" ng-click="show_add_trigger = true">
+                Add Trigger
+                <span
+                    confirm-dialog show="show_add_trigger"
+                    model="state.add_trigger_id"
+                    confirm="state.addTrigger"
+                    title="Select Trigger"
+                >
+                    <p>Select a trigger to add to this system<br />
+                    <search-select model="state.add_trigger_id" source="Trigger" placeholder="Select a Trigger"></search-select></p>
+                </span>
+            </button>
+            <input
+                ng-model="state.triggerFilter"
+                placeholder="Filter Triggers"
+                type="text"
+
+                ng-touch="$event.stopPropagation()"
+                user-select="true" 
+                no-capture
+            >
+            <br /> <br />
+
+            <p ng-if="state.triggers.length == 0">No triggers found. <span ng-if="state.triggerFilter.length > 0">Try adjusting the filter</span></p>
+        </pane>
+    </tabs>
+
+    <div id="sysdevs" ng-show="state.tab === 'devices' && view.modules.length > 0">
+        <table co-system="system.id" ng-controller="ModuleTasksCtrl">
+            <thead>
+                <tr>
+                    <th ng-if="currentUser.sys_admin"></th>
+                    <th class="connected"></th>
+                    <th>Name</th> <!-- TODO:: add indicators for UDP, Makebreak and TLS if device module -->
+                    <th>Class</th>
+                    <th>IP</th>
+                    <th ng-if="currentUser.sys_admin" class="remove" style="width: 7.5em;"></th>
+                </tr>
+            </thead>
+            <tbody ui-sortable="moduleSortOptions" ng-model="view.modules">
+                <tr ng-repeat="module in view.modules track by module.id" co-module="module.coModule" index="module.coIndex">
+                    <td ng-if="currentUser.sys_admin" class="drag-handle drag-keep"></td>
+                    <td class="no-pad" co-bind="'connected' as module.connected">
+                        <div ng-if="module.role !== 3" ng-class="{online: module.connected, offline: !module.connected, paused: !module.running}">
+                        </div>
+                        <div ng-if="module.role === 3" class="online" ng-class="{paused: !module.running}">
+                        </div>
+                    </td>
+                    <td class="drag-keep">
+                        <span class="indicators">
+                            <span ng-if="!module.running" ng-click="startModule(module)">&#xe624;</span>
+                            <span ng-if="module.running" ng-click="stopModule(module)">&#xe621;</span>
+                        </span>
+                        <a goto="modules" search="{module: module.id}">{{module.dependency.name}}</a>
+                        <span class="indicators" ng-click="dump_state(module)">&#xe63e;</span>
+                    </td>
+                    <td>
+                        <span>
+                            <input type="checkbox" ng-model="debug">
+                            <span ng-if="debug" co-debug></span>
+                        </span>
+                        {{module.custom_name || module.dependency.module_name}}
+                        <span style="float:right; margin-right:6px" ng-if="currentUser.sys_admin" ng-click="confirm_reload_dep = true">
+                            <span class="indicators">&#xe61c;</span>
+                            <span
+                                confirm-dialog show="confirm_reload_dep"
+                                model="module.dependency_id"
+                                confirm="reloadDep"
+                                title="Reload Driver?"
+                            >
+                                <p>New driver code will be loaded and device settings will be reloaded.</p>
+                            </span>
+                        </span>
+                    </td>
+                    <td class="drag-keep">
+                        <span ng-if="currentUser.sys_admin" role="button" class="pe-7s-pen"
+                            edit-module show="show_module_edit"
+                            module="module"
+                            on-save="editModuleCB"
+                            ng-touch="show_module_edit = true">
+                        </span>
+                        <a ng-if="module.role !== 3" ng-href="{{buildModuleLink(module)}}" target="_blank">
+                            <span>{{module.ip || module.uri}}</span><span ng-if="module.role === 1" style="font-size: 10px">:{{module.port}}</span>
+                        </a>
+                        <span class="indicators">
+                            <span ng-if="module.tls" title="secure connection">&#xe63f;</span>
+                            <span ng-if="module.udp" title="stateless (UDP)">&#xe650;</span>
+                        </span>
+                    </td>
+                    <td ng-if="currentUser.sys_admin" class="remove">
+                        <button ng-click="confirm_remove_module = true">
+                            Remove
+                            <span
+                                confirm-dialog show="confirm_remove_module"
+                                model="module"
+                                confirm="removeModule"
+                                title="Remove?"
+                            >
+                                <p>Remove {{module.custom_name || module.dependency.module_name}} from this system?<br />
+                                If this is not used elsewhere its data will be deleted immediately.</p>
+                            </span>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <br /> <br />
+        <a ng-show="view.modules.length > 0" id="sys-download">Download CSV</a>
+        <br />
+    </div>
+
+    <div id="systrigs" ng-if="state.tab === 'triggers' && state.triggers.length > 0"
+        co-system="system.id"
+        co-module="'__Triggers__'" index="1"
+    >
+        <!-- 
+            We need to bind to something to build the scope
+            So we bind to connected here for debugging
+         -->
+        <span co-bind="'connected'" co-debug></span>
+        <table ng-show="state.triggers.length > 0"
+            infinite-scroll="moreTriggers()"
+            infinite-scroll-disabled="triggersLoading"
+            infinite-scroll-distance="0.4"
+        >
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Count</th>
+                <th>Added</th>
+                <th style="width:10em;" ng-if="currentUser.sys_admin" class="remove" style="width: 7.5em;"></th>
+            </tr>
+            <tr ng-repeat="trig in state.triggers | orderBy:'name' track by trig.id">
+                <td class="triggered" co-bind="trig.binding as trig.triggered">
+                    <div ng-class="{triggered: trig.triggered, inactive: !trig.triggered, paused: !trig.enabled}">
+                    </div>
+                    <span ng-show="trig.important" title="important"></span>
+                </td>
+                <td>
+                    <a goto="triggers" search="{trigger: trig.trigger_id, sys_id: trig.control_system_id}">{{trig.name}}</a>
+                    <span ng-if="currentUser.sys_admin && trig.conditions[0][0] == 'webhook'"> (<a ng-href="/control/api/webhooks/{{trig.id}}/notify?secret={{trig.webhook_secret}}">Webhook URL</a>)</span>
+                </td>
+                <td co-bind="trig.binding + '_count' as trig.live_count">{{trig.live_count || trig.trigger_count}}</td>
+                <td>{{(trig.created_at * 1000) | fromNow:prettyDate}}</td>
+                <td ng-if="currentUser.sys_admin" class="remove">
+                    <span ng-if="currentUser.sys_admin" role="button" class="pe-7s-pen"
+                        edit-sys-trig show="show_trigger_edit"
+                        trigger="trig"
+                        ng-touch="show_trigger_edit = true">
+                    </span> &nbsp;&nbsp;
+                    <button ng-click="confirm_remove_trig = true">
+                        Remove
+                        <span
+                            confirm-dialog show="confirm_remove_trig"
+                            model="trig"
+                            confirm="state.removeTrigger"
+                            title="Remove Trigger?"
+                        >
+                            <p>Remove trigger '{{trig.name}}' from {{state.system.name}}?<br />
+                            Configuration will be updated immediately.</p>
+                        </span>
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

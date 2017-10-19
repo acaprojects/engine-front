@@ -1,0 +1,20 @@
+<modal class="form" title="Edit Trigger Settings" show="show" visible="visible" no-close>
+    <p>
+        Name: {{trigger.name}}<br />
+        Currently Triggered: {{trigger.triggered}}
+    </p>
+
+    <div ng-if="visible">
+        <validated-form submit-fn="save" model="trigger">
+            <form-checkbox model="enabled"></form-checkbox>
+            <form-checkbox model="important"></form-checkbox>
+            <form-actions>
+                <form-submit>Save</form-submit>
+            </form-actions>
+        </validated-form>
+    </div>
+    <menu>
+        <button class="cancel" ng-touch="cancel()">Cancel</button>
+    </menu>
+    <div style="clear: both"></div>
+</modal>

@@ -1,0 +1,50 @@
+<modal id="new_dependency" class="form" title="New Driver" show="show" visible="visible" no-close>
+    <div ng-if="visible">
+        <div class="discovery">
+            <span class="scan" role="button" ng-hide="updating" ng-click="load_new()">Scan for Drivers</span>
+            <div ng-if="updating" class="updating">
+                <div class="spinner"></div>
+            </div>
+
+            <span ng-hide="updating">
+                <search-select
+                    model="add.discovery"
+                    placeholder="available drivers"
+                    source="Discovery"
+                    text-val="discover_text"
+                ></search-select>
+            </span>
+        </div>
+
+        <br /><br />
+
+        <div ng-if="show_form">
+            <validated-form submit-fn="create" model="add.dependency">
+                <form-field model="name"></form-field>
+                <form-select model="role">
+                    <option value="ssh">SSH</option>
+                    <option value="device">Device</option>
+                    <option value="service">Service</option>
+                    <option value="logic">Logic</option>
+                </form-select>
+                <form-text-area model="description"></form-text-area>
+                <form-field model="module_name"></form-field>
+                <div class="half-width">
+                    <form-field model="default"></form-field>
+                </div>
+                <div class="half-width checkbox-padding">
+                    <form-checkbox model="ignore_connected"></form-checkbox>
+                </div>
+                <div style="clear: both"></div>
+                <form-json-area model="settings"></form-json-area>
+                <form-actions>
+                    <form-submit>Create</form-submit>
+                </form-actions>
+            </validated-form>
+        </div>
+    </div>
+    <menu>
+        <button class="cancel" ng-touch="cancel()">Cancel</button>
+    </menu>
+    <div style="clear: both"></div>
+</div>

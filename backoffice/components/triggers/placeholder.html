@@ -1,0 +1,9 @@
+<div class="view">
+    <div ng-if="state.trigger">
+        <div ng-include="'components/triggers/selected/trigger.html'"></div>
+    </div>
+    <div ng-if="!state.trigger" class="main">
+        <h1>No Trigger Selected</h1>
+        <p class="no-content">Please select a trigger from the sidebar</p>
+    </div>
+</div>

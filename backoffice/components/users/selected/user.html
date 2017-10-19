@@ -1,0 +1,73 @@
+<div class="main view" ng-controller="UserCtrl">
+    <h1>{{state.user.name || state.user.email}}
+
+        <menu ng-if="currentUser.sys_admin">
+            <span role="button" class="pe-7s-pen"
+                edit-user show="show_user_edit"
+                user="state.user"
+                on-save="editUserCB"
+                ng-touch="show_user_edit = true">
+            </span>
+            <span role="button" class="pe-7s-trash"
+                confirm-dialog show="confirm_user_delete"
+                model="state.user"
+                confirm="deleteUserCB"
+                title="Delete User?"
+                ng-touch="confirm_user_delete = true"
+            >
+                <p>The user will be removed from the system within 24 hours.</p>
+            </span>
+        </menu>
+    </h1>
+    <tabs current="state.tab" auto-select="false">
+        <pane icon="user" text="<span>About</span>" name="'about'">
+            <br />
+            <b>Permissions</b>
+            <br />
+            <br />
+            <table>
+                <tr>
+                    <td>Student</td>
+                    <td>{{!!state.user.student}}</td>
+                </tr>
+                <tr>
+                    <td>Supervisor</td>
+                    <td>{{!!state.user.supervisor}}</td>
+                </tr>
+                <tr>
+                    <td>Tech Support</td>
+                    <td>{{!!state.user.support}}</td>
+                </tr>
+                <tr>
+                    <td>System Admin</td>
+                    <td>{{!!state.user.sys_admin}}</td>
+                </tr>
+            </table>
+
+        </pane>
+
+        <pane icon="history" text="<span>History</span> ({{logsTotal}})" name="'history'">
+            <table ng-show="state.logs.length > 0"
+                infinite-scroll="moreLogs()"
+                infinite-scroll-disabled="logsLoading"
+                infinite-scroll-distance="0.4"
+            >
+                <tr>
+                    <th>Session Start</th>
+                    <th>Ended</th>
+                    <th>Systems Accessed</th>
+                </tr>
+                <tr ng-repeat="log in state.logs | orderBy:'created_at':true track by log.id">
+                    <td>{{(log.created_at * 1000) | fromNow:prettyDate}}</td>
+                    <td ng-if="isActive(log)">Currently Accessing</td>
+                    <td ng-if="!isActive(log)">{{((log.ended_at || log.last_checked_at) * 1000) | date:'medium'}}</td>
+                    <td title="{{log.systemList}}">
+                        <b>{{log.systems.length}}</b>
+                        <span ng-if="log.systems.length > 0"> ({{log.systemList | limitTo: 60}})</span>
+                    </td>
+                </tr>
+            </table>
+            <p ng-if="state.logs.length == 0">No logs found.</p>
+        </pane>
+    </tabs>
+</div>

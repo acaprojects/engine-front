@@ -1,0 +1,56 @@
+<div ng-controller="SystemsListCtrl" class="categories-wrapper">
+    <h1>Systems
+        <span 
+            role="button"
+            ng-if="currentUser.sys_admin"
+            class="action"
+            ng-touch="state.show_new_system = true">+
+            <span new-system show="state.show_new_system" on-create="newSystemCB"></span>
+        </span>
+    </h1>
+    <div class="search">
+        <input 
+            ng-model="state.systemFilter"
+            placeholder="Filter systems"
+            type="text"
+
+            ng-touch="$event.stopPropagation()"
+            user-select="true" 
+            no-capture
+        >
+    </div>
+
+    <div
+        infinite-scroll="moreSystems()"
+        infinite-scroll-disabled="systemsLoading"
+        infinite-scroll-distance="0.4"
+        infinite-scroll-container="'#sidescroll'"
+    >
+        <ul class="categories">
+            <li
+                ng-class="{selected: system.id === state.system.id}"
+                ng-repeat="system in state.systems | orderBy:'name' track by system.id"
+                
+            >
+                <a goto="systems" search="{system: system.id}" keep="systemFilter,tab" ng-click="state.system = system">{{system.name}}</a>
+            </li>
+        </ul>
+
+        <!--
+            The loading spinner - showing whenever a request is being made
+         -->
+        <div ng-if="systemsLoading">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <div id="systems-csv">
+        <div ng-if="generating_csv" class="spinner"></div>
+        <button ng-if="!generating_csv" role="button" ng-click="exportToCSV()">Generate CSV</button>
+        <div class="generating" ng-if="generating_csv">
+            Generating CSV...
+        </div>
+        <br /><br />
+        <a ng-show="downloadUrl && !generating_csv" id="sys-all-download">Click to save generated CSV</a>
+    </div>
+</div>

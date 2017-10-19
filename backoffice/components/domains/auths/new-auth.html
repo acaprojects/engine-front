@@ -1,0 +1,18 @@
+<modal class="form" title="New Authentication Source" show="show" visible="visible" no-close>
+    <div ng-if="visible">
+        <select
+            style="margin-left: 1em; margin-bottom: 1em; font-size: larger;"
+            name="selectAuth" id="selectAuth" ng-model="auth.type">
+            <option value="">--- Select Type ---</option> <!-- not selected / blank option -->
+            <option value="oauths">OAuth2</option>
+            <option value="adfs">SAML / ADFS</option>
+            <option value="ldaps">LDAP</option>
+        </select>
+
+        <div ng-include="'components/domains/auths/auth-form.html'"></div>
+    </div>
+    <menu>
+        <button class="cancel" ng-touch="cancel()">Cancel</button>
+    </menu>
+    <div style="clear: both"></div>
+</div>

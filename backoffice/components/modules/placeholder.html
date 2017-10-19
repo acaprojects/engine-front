@@ -1,0 +1,9 @@
+<div class="view">
+    <div ng-if="state.module">
+        <div ng-include="'components/modules/selected/module.html'"></div>
+    </div>
+    <div ng-if="!state.module" class="main">
+        <h1>No device selected</h1>
+        <p class="no-content">Please select from the sidebar</p>
+    </div>
+</div>

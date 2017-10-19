@@ -1,0 +1,78 @@
+<modal class="trig-form" title="Trigger Condition" show="show" visible="visible" no-close>
+    <div class="builder" ng-touch="$event.stopPropagation()" user-select="true" no-capture>
+        <label class="type">
+            Condition Type:
+            <select ng-model="cond.type">
+                <option value="">- Select Condition Type -</option>
+                <option value="Comparison">Compare values</option>
+                <option value="Time">A particular time</option>
+                <option value="Webhook">A webhook</option>
+            </select>
+        </label>
+        <div ng-if="cond.type === 'Comparison'">
+            <div class="value v1">
+                Status variable: 
+                <select ng-model="value1.cmd.module_selected"
+                    ng-options="key as mod.display for (key, mod) in value1.accessors"
+                >
+                </select>
+                <select ng-if="value1.cmd.statuses" ng-model="cond.data[0].status"
+                    ng-options="status for status in value1.cmd.statuses"
+                >
+                </select>
+                <input placeholder='subkey1, subykey2, ...' type="text" ng-model="cond.keys0"></input>
+                <span ng-show="!value1.cmd.statuses && cond.data[0].status">{{cond.data[0].status}}</span>
+            </div>
+            <div class="comparison">
+                <select ng-model="cond.data[1]">
+                    <option value="equal">Equal to</option>
+                    <option value="not_equal">Not equal</option>
+                    <option value="greater_than">Greater than</option>
+                    <option value="greater_than_or_equal">Greater than or Equal to</option>
+                    <option value="less_than">Less than</option>
+                    <option value="less_than_or_equal">Less than or Equal to</option>
+                    <option value="and">Truthy AND</option>
+                    <option value="or">Truthy OR</option>
+                    <option value="exclusive_or">Truthy XOR</option>
+                </select>
+            </div>
+            <div class="value">
+                <select ng-model="cond.v2_Type">
+                    <option value="const">Constant value</option>
+                    <option value="status">Status variable</option>
+                </select>
+                <span ng-if="cond.v2_Type === 'const'">
+                    <input placeholder='true / false, "strings", 1234.67' type="text" ng-model="cond.const_str"></input>
+                </span>
+                <div ng-if="cond.v2_Type === 'status'" class="v2">
+                    <select ng-model="value2.cmd.module_selected"
+                        ng-options="key as mod.display for (key, mod) in value2.accessors"
+                    >
+                    </select>
+                    <select ng-if="value2.cmd.statuses" ng-model="cond.data[2].status"
+                        ng-options="status for status in value2.cmd.statuses"
+                    >
+                    </select>
+                    <input placeholder='subkey1, subykey2, ...' type="text" ng-model="cond.keys2"></input>
+                    <span ng-show="!value2.cmd.statuses && cond.data[2].status">{{cond.data[2].status}}</span>
+                </div>
+            </div>
+        </div>
+        <div ng-if="cond.type === 'Time'">
+            <div cron-selection output="cond.cron" init="cond.data[1].value" config="cron_config"></div>
+        </div>
+        <div ng-if="cond.type === 'Webhook'">
+            <br />Select Type: <select ng-model="cond.data[1]">
+                <option value="ignore">Ignore webhook payload (most secure)</option>
+                <option value="execute_before">Execute payload before running actions</option>
+                <option value="execute_after">Execute payload after running actions</option>
+            </select><br /><br />
+            <span>Webhooks can provide a JSON payload with a command to execute.</span>
+        </div>
+    </div>
+    <menu>
+        <button class="cancel" ng-touch="cancel()">Cancel</button>
+        <button ng-if="cond.type" class="ok" ng-touch="save()">Save</button>
+    </menu>
+    <div style="clear: both"></div>
+</modal>

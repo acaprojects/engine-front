@@ -1,0 +1,32 @@
+<modal class="form" title="Edit System" show="show" visible="visible" no-close>
+    <div ng-if="visible">
+        <validated-form submit-fn="save" model="system">
+            <div class="half-width">
+                <form-field model="name"></form-field>
+            </div>
+            <div class="half-width">
+                <form-field type="email" model="email"></form-field>
+            </div>
+            <form-field type="url"    model="support_url"></form-field>
+            <div class="third-width">
+                <form-field type="number" model="installed_ui_devices" label="Number of Touch Panels"></form-field>
+            </div>
+            <div class="third-width">
+                <form-field type="number" model="capacity"></form-field>
+            </div>
+            <div class="third-width checkbox-padding">
+                <form-checkbox model="bookable" label="Bookable Room"></form-checkbox>
+            </div>
+            <div style="clear: both"></div>
+            <form-text-area model="description"></form-text-area>
+            <form-json-area model="settings"></form-json-area>
+            <form-actions>
+                <form-submit>Save</form-submit>
+            </form-actions>
+        </validated-form>
+    </div>
+    <menu>
+        <button class="cancel" ng-touch="cancel()">Cancel</button>
+    </menu>
+    <div style="clear: both"></div>
+</modal>

@@ -1,0 +1,9 @@
+<div class="view">
+    <div ng-if="state.system">
+        <div ng-include="'components/systems/selected/system.html'"></div>
+    </div>
+    <div ng-if="!state.system" class="main">
+        <h1>No system selected</h1>
+        <p class="no-content">Please select a system from the sidebar</p>
+    </div>
+</div>

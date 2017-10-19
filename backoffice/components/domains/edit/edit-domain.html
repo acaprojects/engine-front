@@ -1,0 +1,33 @@
+<modal class="form" title="Edit Domain" show="show" visible="visible" no-close>
+    <div ng-if="visible">
+        <validated-form submit-fn="save" model="domain">
+            <div class="half-width">
+                <form-field model="name"></form-field>
+            </div>
+            <div class="half-width">
+                <form-field model="dom" label="domain"></form-field>
+            </div>
+
+            <form-field model="login_url"></form-field>
+            <form-field model="logout_url"></form-field>
+
+            <div class="half-width">
+                <form-json-area model="internals"></form-json-area>
+            </div>
+            <div class="half-width">
+                <form-json-area model="config"></form-json-area>
+            </div>
+            <div style="clear: both"></div>
+
+            <form-text-area model="description"></form-text-area>
+
+            <form-actions>
+                <form-submit>Save</form-submit>
+            </form-actions>
+        </validated-form>
+    </div>
+    <menu>
+        <button class="cancel" ng-touch="cancel()">Cancel</button>
+    </menu>
+    
+</modal>

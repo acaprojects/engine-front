@@ -1,0 +1,151 @@
+<div class="main view" ng-controller="ZoneCtrl">
+    <h1>
+        {{state.zone.name}}
+
+        <menu ng-if="currentUser.sys_admin">
+            <span role="button" class="pe-7s-pen"
+                edit-zone show="show_zone_edit"
+                zone="state.zone"
+                on-save="editZoneCB"
+                ng-touch="show_zone_edit = true">
+            </span>
+            <span role="button" class="pe-7s-trash"
+                confirm-dialog show="confirm_zone_delete"
+                model="state.zone"
+                confirm="deleteZoneCB"
+                title="Delete Zone?"
+                ng-touch="confirm_zone_delete = true"
+            >
+                <p>Deleting this zone will immediately delete systems that are in no other zones.</p>
+            </span>
+        </menu>
+    </h1>
+    <tabs current="state.tab" auto-select="false">
+        <pane icon="about" text="<span>About</span>" name="'about'">
+            <b>Execute Command</b>
+            <p ng-touch="$event.stopPropagation()" user-select="true" no-capture>
+                <search-select options="{query:{zone_id:state.zone.id}}" model="exec.system_id" source="System" placeholder="select a template system"></search-select><br />
+                <select ng-if="exec.view"
+                    ng-model="exec.view.cmd.module_selected"
+                    ng-options="key as mod.display for (key, mod) in exec.view.accessors"
+                >
+                    <option value="">select a device</option>
+                </select>
+                <select
+                    ng-if="exec.view.cmd.func_list"
+                    ng-model="exec.view.cmd.func"
+                    ng-options="func for func in exec.view.cmd.func_list"
+                >
+                    <option value="">select a function</option>
+                </select>
+                <span ng-if="exec.view.cmd.func">
+                    (<input ng-if="exec.view.cmd.placeholder.length > 0" placeholder="{{exec.view.cmd.placeholder}}" type="text" ng-model="exec.view.cmd.func_args"></input>)
+                    <button ng-click="exec_cmd()" ng-if="exec.view.cmd.valid_args">Send</button>
+                </span>
+            </p>
+
+
+            <br />
+            <p class="description cleanslate" markdown-to-html="state.zone.description || ''"></p>
+            <br />
+            <b>Settings</b>
+            <p class="code" ng-bind-html="printSettings(settings) | newlines"></p>
+
+        </pane>
+
+        <pane icon="systems" text="<span>Systems</span> ({{systemsTotal}})" name="'systems'">
+            <input 
+                ng-model="state.systemFilter"
+                placeholder="Filter Systems"
+                type="text"
+
+                ng-touch="$event.stopPropagation()"
+                user-select="true" 
+                no-capture
+            >
+            <table ng-show="state.systems.length > 0"
+                infinite-scroll="moreSystems()"
+                infinite-scroll-disabled="systemsLoading"
+                infinite-scroll-distance="0.4"
+            >
+                <tr>
+                    <th>Name</th>
+                    <th>No. Modules</th>
+                    <th>Created</th>
+                    <th ng-if="currentUser.sys_admin" class="remove" style="width: 7.5em;"></th>
+                </tr>
+                <tr ng-repeat="system in state.systems | orderBy:'name' track by system.id">
+                    <td><a goto="systems" search="{system: system.id}">{{system.name}} ({{system.id}})</a></td>
+                    <td>{{system.modules.length}}</td>
+                    <td>{{(system.created_at * 1000) | fromNow:prettyDate}}</td>
+                    <td ng-if="currentUser.sys_admin" class="remove">
+                        <button ng-show="system.zones.length > 1" ng-click="confirm_remove_system = true">
+                            Remove
+                            <span
+                                confirm-dialog show="confirm_remove_system"
+                                model="system"
+                                confirm="removeSystem"
+                                title="Remove System?"
+                            >
+                                <p>Remove '{{system.name}}' from this zone?<br />
+                                New system settings will be applied immediately.</p>
+                            </span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <p ng-if="state.systems.length == 0">No systems found. <span ng-if="state.systemFilter.length > 0">Try adjusting the filter</span></p>
+        </pane>
+
+        <pane icon="triggers" text="<span>Triggers</span> ({{state.zone.triggers.length}})" name="'triggers'">
+            <button ng-if="currentUser.sys_admin" ng-click="show_add_trigger = true">
+                Add Trigger
+                <span
+                    confirm-dialog show="show_add_trigger"
+                    model="state.add_trigger_id"
+                    confirm="addTrigger"
+                    title="Add Trigger"
+                >
+                    <p>
+                        Select a trigger to add to this zone<br />
+                        <search-select model="state.add_trigger_id" source="Trigger" placeholder="Select a Trigger"></search-select>
+                    </p>
+                </span>
+            </button>
+            <br /> <br />
+
+            <table ng-if="state.zone.triggers.length > 0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th ng-if="currentUser.sys_admin" class="remove" style="width: 6.5em;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="trigger in state.zone.trigger_data track by trigger.id">
+                        <td>
+                            <a goto="triggers" search="{trigger: trigger.id}">{{trigger.name}}</a>
+                        </td>
+                        <td>{{trigger.description | limitTo : 60}}</td>
+                        <td ng-if="currentUser.sys_admin" class="remove">
+                            <button ng-click="confirm_remove_trigger = true">
+                                Remove
+                                <span
+                                    confirm-dialog show="confirm_remove_trigger"
+                                    model="trigger"
+                                    confirm="removeTrigger"
+                                    title="Remove Trigger?"
+                                >
+                                    <p>Remove trigger from zone {{trigger.name}}?<br />
+                                    Configuration will be updated immediately.</p>
+                                </span>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p ng-if="state.zone.triggers.length == 0">No zone level triggers.</p>
+        </pane>
+    </tabs>
+</div>

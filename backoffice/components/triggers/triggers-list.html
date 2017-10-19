@@ -1,0 +1,45 @@
+<div ng-controller="TriggersListCtrl" class="categories-wrapper">
+    <h1>Triggers
+        <span 
+            role="button"
+            ng-if="currentUser.sys_admin"
+            class="action"
+            ng-touch="state.show_new_trigger = true">+
+            <span new-trigger show="state.show_new_trigger" on-create="newTriggerCB"></span>
+        </span>
+    </h1>
+    <div class="search">
+        <input 
+            ng-model="state.triggerFilter"
+            placeholder="Filter Triggers"
+            type="text"
+
+            ng-touch="$event.stopPropagation()"
+            user-select="true" 
+            no-capture
+        >
+    </div>
+
+    <div
+        infinite-scroll="moreTriggers()"
+        infinite-scroll-disabled="triggersLoading"
+        infinite-scroll-distance="0.4"
+        infinite-scroll-container="'#sidescroll'"
+    >
+        <ul class="categories">
+            <li
+                ng-class="{selected: trigger.id === state.trigger.id}"
+                ng-repeat="trigger in state.triggers | orderBy:'name' track by trigger.id"
+            >
+                <a goto="triggers" search="{trigger: trigger.id}" keep="triggerFilter,tab" ng-click="state.trigger = trigger">{{trigger.name}}</a>
+            </li>
+        </ul>
+
+        <!--
+            The loading spinner - showing whenever a request is being made
+         -->
+        <div ng-if="triggersLoading">
+            <div class="spinner"></div>
+        </div>
+    </div>
+</div>

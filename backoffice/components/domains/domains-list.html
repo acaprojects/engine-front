@@ -1,0 +1,45 @@
+<div ng-controller="DomainsListCtrl" class="categories-wrapper">
+    <h1>Domains
+        <span
+            role="button"
+            ng-if="currentUser.sys_admin"
+            class="action"
+            ng-touch="state.show_new_domain = true">+
+            <span new-domain show="state.show_new_domain" on-create="newDomainCB"></span>
+        </span>
+    </h1>
+    <div class="search">
+        <input 
+            ng-model="state.domainFilter"
+            placeholder="Filter Domains"
+            type="text"
+
+            ng-touch="$event.stopPropagation()"
+            user-select="true" 
+            no-capture
+        >
+    </div>
+
+    <div
+        infinite-scroll="moreDomains()"
+        infinite-scroll-disabled="domainsLoading"
+        infinite-scroll-distance="0.4"
+        infinite-scroll-container="'#sidescroll'"
+    >
+        <ul class="categories">
+            <li
+                ng-class="{selected: domain.id === state.domain.id}"
+                ng-repeat="domain in state.domains | orderBy:'name' track by domain.id"
+            >
+                <a goto="domains" search="{domain: domain.id}" keep="domainFilter,tab" ng-click="state.domain = domain">{{domain.name}}</a>
+            </li>
+        </ul>
+
+        <!--
+            The loading spinner - showing whenever a request is being made
+         -->
+        <div ng-if="domainsLoading">
+            <div class="spinner"></div>
+        </div>
+    </div>
+</div>

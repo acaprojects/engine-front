@@ -1,0 +1,32 @@
+<div ng-controller="TestingListCtrl" class="categories-wrapper">
+    <h1>Spec Files</h1>
+    <div class="search">
+        <input
+            ng-model="state.testFilter"
+            placeholder="Filter"
+            type="text"
+
+            ng-touch="$event.stopPropagation()"
+            user-select="true" 
+            no-capture
+        >
+    </div>
+
+    <div>
+        <ul class="categories">
+            <li
+                ng-class="{selected: test.path === state.test.path}"
+                ng-repeat="test in state.tests | filter:state.testFilter"
+            >
+                <a goto="testing" search="{test: test.path}" ng-click="state.test = test">{{test.name}}</a>
+            </li>
+        </ul>
+
+        <!--
+            The loading spinner - showing whenever a request is being made
+         -->
+        <div ng-if="filesLoading">
+            <div class="spinner"></div>
+        </div>
+    </div>
+</div>

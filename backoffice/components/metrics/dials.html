@@ -1,0 +1,49 @@
+<div id="metrics" ng-controller="MetricsCtrl" class="categories-wrapper">
+    <h1>Metrics</h1>
+    <div class="graph">
+        <h2>Graph Options</h2>
+        <label for="periodSelect">Graph period:</label>
+        <select name="periodSelect" ng-model="state.period">
+            <option value="hour">Last Hour</option>
+            <option value="day">Last Day</option>
+            <option value="week">Last Week</option>
+            <option value="month">Last Month</option>
+        </select>
+    </div>
+
+    <div class="url">
+        <h2><a ng-href="{{rawURL}}" target="_blank">Full Screen URL</a></h2>
+        <input type="text" ng-model="rawURL" readonly />
+    </div>
+
+    <div class="ignored">
+        <h2>Hidden Issues:</h2>
+        <div ng-repeat="hidden in ignored track by hidden.id" ng-if="hidden.timeout > time">
+            <a goto="users" search="{user: hidden.user_id}" class="avatar-img-wrapper" title="{{hidden.name}}">
+                <img ng-src="https://www.gravatar.com/avatar/{{hidden.email_digest}}?s=33">
+            </a>
+            <a class="title" ng-if="hidden.klass === 'interface'" goto="systems" search="{system: hidden.id, tab: 'about'}">
+                {{hidden.title}}
+            </a>
+            <a class="title" ng-if="hidden.klass === 'device'" goto="modules" search="{module: hidden.id}">
+                {{hidden.title}}
+            </a>
+            <a class="title" ng-if="hidden.klass === 'trigger'" goto="systems" search="{system: hidden.sys_id, tab: 'triggers'}">
+                {{hidden.title}}
+            </a>
+            <br />
+            <span class="reason">
+                {{hidden.reason || 'No reason provided'}}
+            </span>
+            <span role="button" class="pe-7s-trash"
+                confirm-dialog show="confirm_unignore"
+                model="hidden"
+                confirm="unignoreCB"
+                title="Display this Issue"
+                ng-touch="confirm_unignore = true"
+            >
+                <p>{{hidden.title}}<br />will appear in the Metrics issue list</p>
+            </span>
+        </div>
+    </div>
+</div>

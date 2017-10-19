@@ -1,0 +1,9 @@
+<div class="view">
+    <div ng-if="state.driver">
+        <div ng-include="'components/dependencies/selected/dependency.html'"></div>
+    </div>
+    <div ng-if="!state.driver" class="main">
+        <h1>No Driver Selected</h1>
+        <p class="no-content">Please select a driver from the sidebar</p>
+    </div>
+</div>

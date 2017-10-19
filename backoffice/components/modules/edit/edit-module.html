@@ -1,0 +1,45 @@
+<modal class="form" title="Edit Module" show="show" visible="visible" no-close>
+    <div ng-if="visible">
+        <div ng-if="module.role === 0 || module.role === 1">
+            <validated-form submit-fn="save" model="module">
+                <form-field model="ip"></form-field>
+                <form-field model="port"></form-field>
+                <form-checkbox model="tls"></form-checkbox>
+                <form-checkbox model="udp"></form-checkbox>
+                <form-checkbox model="makebreak"></form-checkbox>
+                <form-checkbox model="ignore_connected"></form-checkbox>
+                <form-text-area model="notes"></form-text-area>
+                <form-json-area model="settings"></form-json-area>
+                <form-field model="custom_name"></form-field>
+                <form-actions>
+                    <form-submit>Save</form-submit>
+                </form-actions>
+            </validated-form>
+        </div>
+        <div ng-if="module.role === 2">
+            <validated-form submit-fn="save" model="module">
+                <form-field model="uri"></form-field>
+                <form-text-area model="notes"></form-text-area>
+                <form-json-area model="settings"></form-json-area>
+                <form-field model="custom_name"></form-field>
+                <form-actions>
+                    <form-submit>Save</form-submit>
+                </form-actions>
+            </validated-form>
+        </div>
+        <div ng-if="module.role === 3">
+            <validated-form submit-fn="save" model="module">
+                <form-text-area model="notes"></form-text-area>
+                <form-json-area model="settings"></form-json-area>
+                <form-field model="custom_name"></form-field>
+                <form-actions>
+                    <form-submit>Save</form-submit>
+                </form-actions>
+            </validated-form>
+        </div>
+    </div>
+    <menu>
+        <button class="cancel" ng-touch="cancel()">Cancel</button>
+    </menu>
+    <div style="clear: both"></div>
+</modal>

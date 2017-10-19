@@ -1,0 +1,9 @@
+<div class="view">
+    <div ng-if="state.user">
+        <div ng-include="'components/users/selected/user.html'"></div>
+    </div>
+    <div ng-if="!state.user" class="main">
+        <h1>No User Selected</h1>
+        <p class="no-content">Please select a user from the sidebar</p>
+    </div>
+</div>

@@ -1,0 +1,45 @@
+<div ng-controller="UsersListCtrl" class="categories-wrapper">
+    <h1>Users
+        <span 
+            role="button"
+            ng-if="currentUser.sys_admin"
+            class="action"
+            ng-touch="state.show_new_user = true">+
+            <span new-user show="state.show_new_user" on-create="newUserCB"></span>
+        </span>
+    </h1>
+    <div class="search">
+        <input 
+            ng-model="state.userFilter"
+            placeholder="Filter Users"
+            type="text"
+
+            ng-touch="$event.stopPropagation()"
+            user-select="true" 
+            no-capture
+        >
+    </div>
+
+    <div
+        infinite-scroll="moreUsers()"
+        infinite-scroll-disabled="usersLoading"
+        infinite-scroll-distance="0.4"
+        infinite-scroll-container="'#sidescroll'"
+    >
+        <ul class="categories">
+            <li
+                ng-class="{selected: user.id === state.user.id}"
+                ng-repeat="user in state.users | orderBy:'name' track by user.id"
+            >
+                <a goto="users" search="{user: user.id}" keep="userFilter,tab" ng-click="state.user = user">{{user.name || user.email}}</a>
+            </li>
+        </ul>
+
+        <!--
+            The loading spinner - showing whenever a request is being made
+         -->
+        <div ng-if="usersLoading">
+            <div class="spinner"></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,23 @@
+<modal class="form" title="New Application" show="show" visible="visible" no-close>
+    <div ng-if="visible">
+        <validated-form submit-fn="create" model="application">
+            <div class="half-width">
+                <form-field model="name"></form-field>
+            </div>
+            <div class="half-width">
+                <form-field model="scopes"></form-field>
+            </div>
+
+            <form-checkbox model="skip_authorization"></form-checkbox>
+            <form-field model="redirect_uri" label="Redirect URI"></form-field>
+
+            <form-actions>
+                <form-submit>Create</form-submit>
+            </form-actions>
+        </validated-form>
+    </div>
+    <menu>
+        <button class="cancel" ng-touch="cancel()">Cancel</button>
+    </menu>
+    <div style="clear: both"></div>
+</div>

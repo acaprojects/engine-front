@@ -1,0 +1,252 @@
+<!doctype html>
+<html ng-app="AcaEngine" ng-controller="AppCtrl" manifest="app.appcache">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>ACA Engine</title>
+    <meta name="description" content="buildings made easy">
+
+    <!--
+      https://developer.apple.com/library/ios/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html
+      https://developer.chrome.com/multidevice/android/installtohomescreen
+
+      http://blogs.msdn.com/b/ie/archive/2014/05/21/support-a-live-tile-for-your-website-on-windows-and-windows-phone-8-1.aspx
+      http://blogs.msdn.com/b/ie/archive/2012/04/03/pinned-sites-in-windows-8.aspx
+      http://blogs.msdn.com/b/ie/archive/2012/06/08/high-quality-visuals-for-pinned-sites-in-windows-8.aspx
+      http://www.xiconeditor.com/
+     -->
+    <link rel="icon" type="image/png" href="branding/favicon/48.png" sizes="48x48">
+    <link rel="icon" type="image/png" href="branding/favicon/64.png" sizes="64x64">
+    <link rel="icon" type="image/png" href="branding/favicon/128.png" sizes="128x128">
+    <link rel="icon" type="image/png" href="branding/favicon/w3c_192.png" sizes="192x192">
+
+    <!-- W3C Icons -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- MS Application Icon -->
+    <meta name="application-name" content="ACA Engine">
+    <meta name="msapplication-tooltip" content="buildings made easy">
+    <meta name="msapplication-starturl" content="./">
+    <meta name="msapplication-navbutton-color" content="#b72706">
+    <meta name="msapplication-TileColor" content="#b72706" />
+    <!-- Win8 -->
+    <meta name="msapplication-TileImage" content="branding/favicon/win_144.png" />
+    <!-- Win8.1 -->
+    <meta name="msapplication-square70x70logo" content="branding/favicon/win_70.png" />
+    <meta name="msapplication-square150x150logo" content="branding/favicon/win_150.png" />
+    <meta name="msapplication-square310x310logo" content="branding/favicon/win_310.png" />
+
+    <!-- Apple Application Icon -->
+    <link rel="apple-touch-icon" href="branding/favicon/ios_76.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="branding/favicon/ios_76.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="branding/favicon/ios_120.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="branding/favicon/ios_152.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+
+
+    <!-- Hide things until page is loaded -->
+    <style>
+        div#loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+
+            padding-top: 4em;
+            text-align: center;
+
+            background-color: white;
+            color: black;
+            z-index: 999999;
+
+            -webkit-transition: opacity linear 0.3s;
+            transition: opacity linear 0.3s;
+            opacity: 1;
+        }
+
+        div#loading.ng-leave {
+          opacity: 1;
+        }
+
+        div#loading.ng-leave.ng-leave-active {
+          opacity: 0;
+        }
+
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+            display: none !important;
+        }
+    </style>
+
+    <!-- Note:: This is deliberately a seperate style sheet -->
+    <link rel="stylesheet" href="layout/select2/select2.css">
+
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body
+    ng-controller="NavCtrl"
+    ng-swipe-left="hideNav()"
+    ng-swipe-right="showNav()"
+
+    drag-begin="dragStartNav($event)"
+    ng-drag="dragNav($event)"
+    drag-stop="dragEndNav()"
+    drag-directions="'left right'"
+
+    touch-action="pan-y"
+    drag-y-axis="false"
+    user-select="true"
+
+    ng-class="{
+        navAnimate: navAnimate,
+        navDecorate: navDecorate,
+        navOpen: navOpen,
+        noAuth: !authenticated
+    }"
+  >
+    <!--
+        Show a loading screen until we know if we are authenticated or not
+     -->
+    <div id="loading" ng-if="authenticated !== true">
+        <h1>Loading...</h1>
+        <div>
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <div
+        id="touch-overlay" 
+        ng-touch="toggleNav()"
+    >
+        <!--
+            For closing the mobile sidebar when it is showing
+            Provides a touch area over the sliver of the visible content
+         -->
+    </div>
+
+    <header 
+        class="promote-layer" 
+        ng-touch="$event.stopPropagation()" 
+        user-select="true" 
+        no-capture
+    >
+        <div class="logo aca"></div>
+
+        <div class="user" ng-if="currentUser" ng-click="$root.showLogoutPanel = !$root.showLogoutPanel">
+            <div class="avatar-img-wrapper">
+                <img ng-src="https://www.gravatar.com/avatar/{{currentUser.email_digest}}?s=33">
+            </div>
+            <div class="name">{{currentUser.name || currentUser.email}}</div>
+        </div>
+
+        <span id="show-menu" ng-touch="toggleNav()">
+            <div class="logo aca-small"></div>
+        </span>
+
+        <div id="logout-panel-click-capture" ng-show="$root.showLogoutPanel" ng-click="$root.showLogoutPanel = false"></div>
+        <div class="popover" ng-if="authenticated" id="logout-panel" ng-show="$root.showLogoutPanel">
+            <div id="logout-panel-avatar-img-wrapper">
+                <img ng-src="https://www.gravatar.com/avatar/{{currentUser.email_digest}}?s=45">
+            </div>
+            <div id="logout-panel-user-details">
+                <p>{{currentUser.name}}</p>
+                <p>{{currentUser.email}}</p>
+                <span class="button" ng-click="logout()">Sign Out</span>
+            </div>
+        </div>
+    </header>
+
+
+    <aside class="promote-layer">
+      <div id="aside-wrapper">
+        <!-- 
+          This is only shown on mobile
+          We use ng-click to prevent ghost clicks on iOS and android
+        -->
+        <div id="nav-buffer">
+            <div class="logo aca"></div>
+            <div class="account-actions">
+                <div class="user" ng-if="authenticated">
+                    <div class="icon pe-7s-power" ng-click="logout()"></div>
+                    <span>
+                        <span class="logout" ng-click="logout()">Sign Out</span>
+                        <span class="name">{{currentUser.name}}</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Primary navigation -->
+        <div id="nav-wrapper">
+            <nav>
+                <a goto="systems" search="{}">Systems</a>
+                <a goto="modules" search="{}">Devices</a>
+                <a goto="zones" search="{}">Zones</a>
+                <a goto="dependencies" search="{}">Drivers</a>
+                <a goto="triggers" search="{}">Triggers</a>
+                <a goto="metrics" search="{}">Metrics</a>
+                <a ng-if="currentUser.sys_admin" goto="users" search="{}">Users</a>
+                <a ng-if="currentUser.sys_admin" goto="domains" search="{}">Domains</a>
+                <a ng-if="currentUser.sys_admin && authority.production === false" goto="testing" search="{}">Testing</a>
+            </nav>
+
+            <!-- This is the supporting content section -->
+            <section id="sidescroll" ng-touch="$event.stopPropagation()" on-target>
+                <div ng-switch="$route.current.name">
+                    <div ng-switch-when="systems">
+                        <div ng-include="'components/systems/systems-list.html'">
+                        </div>
+                    </div>
+                    <div ng-switch-when="modules">
+                        <div ng-include="'components/modules/modules-list.html'">
+                        </div>
+                    </div>
+                    <div ng-switch-when="zones">
+                        <div ng-include="'components/zones/zones-list.html'">
+                        </div>
+                    </div>
+                    <div ng-switch-when="dependencies">
+                        <div ng-include="'components/dependencies/dependencies-list.html'">
+                        </div>
+                    </div>
+                    <div ng-switch-when="triggers">
+                        <div ng-include="'components/triggers/triggers-list.html'">
+                        </div>
+                    </div>
+                    <div ng-switch-when="metrics">
+                        <div ng-include="'components/metrics/dials.html'">
+                        </div>
+                    </div>
+                    <div ng-switch-when="users">
+                        <div ng-if="currentUser.sys_admin" ng-include="'components/users/users-list.html'">
+                        </div>
+                    </div>
+                    <div ng-switch-when="domains">
+                        <div ng-if="currentUser.sys_admin" ng-include="'components/domains/domains-list.html'">
+                        </div>
+                    </div>
+                    <div ng-switch-when="testing">
+                        <div ng-if="currentUser.sys_admin && authority.production === false" ng-include="'components/testing/testing-list.html'">
+                        </div>
+                    </div>
+                </div>
+            </section>
+            </div>
+        </div>
+    </aside>
+
+    <main ng-view ng-class="$route.current.$$route.name">
+    </main>
+
+    <!-- notifications are displayed here -->
+    <div class="notifications" growl-notifications></div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,45 @@
+<div ng-controller="ZonesListCtrl" class="categories-wrapper">
+    <h1>Zones
+        <span 
+            role="button"
+            ng-if="currentUser.sys_admin"
+            class="action"
+            ng-touch="state.show_new_zone = true">+
+            <span new-zone show="state.show_new_zone" on-create="newZoneCB"></span>
+        </span>
+    </h1>
+    <div class="search">
+        <input 
+            ng-model="state.zoneFilter"
+            placeholder="Filter Zones"
+            type="text"
+
+            ng-touch="$event.stopPropagation()"
+            user-select="true" 
+            no-capture
+        >
+    </div>
+
+    <div
+        infinite-scroll="moreZones()"
+        infinite-scroll-disabled="zonesLoading"
+        infinite-scroll-distance="0.4"
+        infinite-scroll-container="'#sidescroll'"
+    >
+        <ul class="categories">
+            <li
+                ng-class="{selected: zone.id === state.zone.id}"
+                ng-repeat="zone in state.zones | orderBy:'name' track by zone.id"
+            >
+                <a goto="zones" search="{zone: zone.id}" keep="zoneFilter,tab" ng-click="state.zone = zone">{{zone.name}}</a>
+            </li>
+        </ul>
+
+        <!--
+            The loading spinner - showing whenever a request is being made
+         -->
+        <div ng-if="zonesLoading">
+            <div class="spinner"></div>
+        </div>
+    </div>
+</div>

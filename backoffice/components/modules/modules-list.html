@@ -1,0 +1,53 @@
+<div ng-controller="ModulesCtrl" class="categories-wrapper">
+    <h1>Devices
+        <span 
+            role="button"
+            ng-if="currentUser.sys_admin"
+            class="action"
+            ng-touch="state.show_new_module = true">+
+            <span new-module show="state.show_new_module" on-create="newModuleCB"></span>
+        </span>
+    </h1>
+    <div class="search" style="text-align: right">
+        <input 
+            ng-model="state.moduleFilter"
+            placeholder="Filter Devices"
+            type="text"
+
+            ng-touch="$event.stopPropagation()"
+            user-select="true" 
+            no-capture
+        />
+
+        <br />
+        <br />
+        Only Disconnected:&nbsp;&nbsp;&nbsp;&nbsp;
+        <div ios-toggle model="state.onlyDisconnected"></div>
+    </div>
+
+    <div
+        infinite-scroll="moreModules()"
+        infinite-scroll-disabled="modulesLoading"
+        infinite-scroll-distance="0.4"
+        infinite-scroll-container="'#sidescroll'"
+    >
+        <ul class="categories">
+            <li
+                ng-class="{selected: module.id === state.module.id}"
+                ng-repeat="module in state.modules track by module.id"
+            >
+                <a goto="modules" search="{module: module.id}" keep="moduleFilter,tab,onlyDisconnected" ng-click="state.module = module">
+                    <span>{{module.dependency.name}}</span> - 
+                    <span>{{module.ip || module.uri || module.control_system.name}}</span>
+                </a>
+            </li>
+        </ul>
+
+        <!--
+            The loading spinner - showing whenever a request is being made
+         -->
+        <div ng-if="modulesLoading">
+            <div class="spinner"></div>
+        </div>
+    </div>
+</div>

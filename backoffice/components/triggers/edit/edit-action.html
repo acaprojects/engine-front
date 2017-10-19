@@ -1,0 +1,49 @@
+<modal class="trig-form" title="Trigger Action" show="show" visible="visible" no-close>
+    <div class="builder" ng-touch="$event.stopPropagation()" user-select="true" no-capture>
+        <label class="type">
+            Action Type:
+            <select ng-model="act.data.type">
+                <option value="">- Select Action Type -</option>
+                <option value="exec">Run Command</option>
+                <option value="email">Send Email</option>
+            </select>
+        </label>
+        <div class="value exec" ng-if="act.data.type === 'exec'">
+            <select ng-model="value.cmd.module_selected"
+                ng-options="key as mod.display for (key, mod) in value.accessors"
+            >
+                <option value="">select a device</option>
+            </select>
+            <select
+                ng-if="value.cmd.func_list"
+                ng-model="value.cmd.func"
+                ng-options="func for func in value.cmd.func_list"
+            >
+                <option value="">select a function</option>
+            </select>
+            <span ng-if="value.cmd.func">
+                <br /><br />Parameters:
+                <input ng-if="value.cmd.placeholder.length > 0" placeholder="{{value.cmd.placeholder}}" type="text" ng-model="value.cmd.func_args"></input>
+                <br /><br />
+                <button class="cancel" ng-click="exec_cmd()" ng-if="value.cmd.valid_args">Test</button>
+            </span>
+
+
+            <span ng-show="!value.cmd.func_list && act.data.func">{{act.data.func}} {{convertJSON(act.data.args)}}</span>
+        </div>
+        <div class="value email" ng-if="act.data.type === 'email'">
+            <label>
+                Email Addresses: <input ng-model="act.data.emails" type="text" placeholder="admin@org.com, staff@other.com"></input>
+            </label>
+            <label>
+                Content:
+                <textarea ng-model="act.data.content" rows="10" style="width: 100%;"></textarea>
+            </label>
+        </div>
+    </div>
+    <menu>
+        <button class="cancel" ng-touch="cancel()">Cancel</button>
+        <button ng-if="act.data.type === 'email' || value.cmd.func && value.cmd.valid_args" class="ok" ng-touch="save()">Save</button>
+    </menu>
+    <div style="clear: both"></div>
+</modal>

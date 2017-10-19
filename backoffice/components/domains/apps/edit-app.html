@@ -1,0 +1,25 @@
+<modal class="form" title="Edit Application" show="show" visible="visible" no-close>
+    <div ng-if="visible">
+        <validated-form submit-fn="save" model="application">
+            <div class="half-width">
+                <form-field model="name"></form-field>
+            </div>
+            <div class="half-width">
+                <form-field model="scopes"></form-field>
+            </div>
+
+            <p>App ID: {{application.id}}</p>
+
+            <form-checkbox model="skip_authorization"></form-checkbox>
+            <form-field model="secret"></form-field>
+
+            <form-actions>
+                <form-submit>Save</form-submit>
+            </form-actions>
+        </validated-form>
+    </div>
+    <menu>
+        <button class="cancel" ng-touch="cancel()">Cancel</button>
+    </menu>
+    
+</modal>

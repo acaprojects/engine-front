@@ -1,0 +1,9 @@
+<div class="view">
+    <div ng-if="state.zone">
+        <div ng-include="'components/zones/selected/zone.html'"></div>
+    </div>
+    <div ng-if="!state.zone" class="main">
+        <h1>No Zone Selected</h1>
+        <p class="no-content">Please select a zone from the sidebar</p>
+    </div>
+</div>

@@ -1,0 +1,300 @@
+<!doctype html>
+<html ng-app="AcaEngine" ng-controller="AppCtrl">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>ACA Engine</title>
+    <meta name="description" content="buildings made easy">
+
+    <!--
+      https://developer.apple.com/library/ios/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html
+      https://developer.chrome.com/multidevice/android/installtohomescreen
+
+      http://blogs.msdn.com/b/ie/archive/2014/05/21/support-a-live-tile-for-your-website-on-windows-and-windows-phone-8-1.aspx
+      http://blogs.msdn.com/b/ie/archive/2012/04/03/pinned-sites-in-windows-8.aspx
+      http://blogs.msdn.com/b/ie/archive/2012/06/08/high-quality-visuals-for-pinned-sites-in-windows-8.aspx
+      http://www.xiconeditor.com/
+     -->
+    <link rel="icon" type="image/png" href="branding/favicon/48.png" sizes="48x48">
+    <link rel="icon" type="image/png" href="branding/favicon/64.png" sizes="64x64">
+    <link rel="icon" type="image/png" href="branding/favicon/128.png" sizes="128x128">
+    <link rel="icon" type="image/png" href="branding/favicon/w3c_192.png" sizes="192x192">
+
+    <!-- W3C Icons -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- MS Application Icon -->
+    <meta name="application-name" content="ACA Engine">
+    <meta name="msapplication-tooltip" content="buildings made easy">
+    <meta name="msapplication-starturl" content="./">
+    <meta name="msapplication-navbutton-color" content="#b72706">
+    <meta name="msapplication-TileColor" content="#b72706" />
+    <!-- Win8 -->
+    <meta name="msapplication-TileImage" content="branding/favicon/win_144.png" />
+    <!-- Win8.1 -->
+    <meta name="msapplication-square70x70logo" content="branding/favicon/win_70.png" />
+    <meta name="msapplication-square150x150logo" content="branding/favicon/win_150.png" />
+    <meta name="msapplication-square310x310logo" content="branding/favicon/win_310.png" />
+
+    <!-- Apple Application Icon -->
+    <link rel="apple-touch-icon" href="branding/favicon/ios_76.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="branding/favicon/ios_76.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="branding/favicon/ios_120.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="branding/favicon/ios_152.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+
+
+    <!-- Hide things until page is loaded -->
+    <style>
+        div#loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+
+            padding-top: 4em;
+            text-align: center;
+
+            background-color: white;
+            color: black;
+            z-index: 999999;
+
+            -webkit-transition: opacity linear 0.3s;
+            transition: opacity linear 0.3s;
+            opacity: 1;
+        }
+
+        div#loading.ng-leave {
+          opacity: 1;
+        }
+
+        div#loading.ng-leave.ng-leave-active {
+          opacity: 0;
+        }
+
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+            display: none !important;
+        }
+    </style>
+
+    <link rel="stylesheet" href="./dashboard.css">
+  </head>
+  <body ng-controller="DashboardCtrl">
+
+    <!--
+        Show a loading screen until we know if we are authenticated or not
+     -->
+    <div id="loading" ng-if="authenticated !== true">
+        <h1>Loading...</h1>
+        <div>
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+
+    <header>
+        <h1><span class="pulse"></span> ACA Metrics</h1>
+        <div id="datetime">
+            <div class="clock">
+                <div class="clock-face">
+                    <div id="hour" class="clock-hour"></div>
+                    <div id="minute" class="clock-minute"></div>
+                    <div id="second" class="clock-second"></div>
+                </div>
+            </div>
+            <div>{{timeNow | date:'HH:mm a'}}</div>
+            <div>{{timeNow | date:'EEE, MMM d'}}</div>
+        </div>
+        <div id="weather"></div>
+
+        <div id="overview">
+            <span ng-if="state.offline < 1">There are no connection issues</span>
+            <span ng-if="state.offline == 1">There is 1 device offline</span>
+            <span ng-if="state.offline > 1">There are {{state.offline}} devices offline</span>
+        </div>
+    </header>
+
+    <main>
+        <div update-pretties>
+            <div class="system"
+                ng-repeat="system in state.systems_ordered | orderBy:$index"
+            >
+                <div class="name">
+                    <a ng-if="system.id !== 'no system'" ng-href="./#/?tab=about&system={{system.id}}" target="_blank">{{system.name}} ({{system.id}})</a>
+                    <span ng-if="system.id === 'no system'">{{system.name}} ({{system.id}})</span>
+                    <!-- TODO
+                        <div class="close"></div>
+                     -->
+                </div>
+                <table>
+                    <tr class="offline"
+                        ng-repeat="device in system.offline track by device.id"
+                    >
+                        <td>
+                            <a ng-href="./#/devices?tab=about&module={{device.id}}" target="_blank">{{device.custom_name || device.dependency.module_name}}</a>
+                        </td>
+                        <td>
+                            <a ng-href="./#/devices?tab=about&module={{device.id}}" target="_blank">{{device.dependency.name}}</a>
+                        </td>
+                        <td>
+                            <a ng-href="{{buildModuleLink(device)}}" target="_blank">{{device.ip || device.uri}}</a>
+                        </td>
+                        <td>Disconnected</td>
+                        <td>
+                            {{device.updated_at * 1000 | fromNow:prettyDate}}
+                        </td>
+
+                        <td class="actions">
+                            <span class="pe-7s-check" ng-click="show_ignore = true">
+                                <span
+                                    confirm-dialog show="show_ignore"
+                                    model="device"
+                                    confirm="ignoreIssue"
+                                    cancel="closeIgnore"
+                                    title="Hide Device Issue"
+                                >
+                                    <p class="ignore" ng-if="show_ignore" ng-init="state.preventRefresh = true; device.ignore_reason = ''; device.ignore_period = 'week';">
+                                        Hide issue for:
+                                        <select ng-model="device.ignore_period">
+                                            <option value="day">24 Hours</option>
+                                            <option value="three_days">3 days</option>
+                                            <option value="week">1 Week</option>
+                                            <option value="fortnight">A fortnight</option>
+                                            <option value="month">1 Month</option>
+                                        </select>
+                                        <br /><br />
+                                        Please leave a reason for hiding this issue:<br />
+                                        <textarea rows="5" ng-model="device.ignore_reason"></textarea>
+                                    </p>
+                                </span>
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="trigger"
+                        ng-repeat="trig in system.triggers | orderBy:'updated_at' track by trig.id"
+                    >
+                        <td>
+                            Trigger
+                        </td>
+                        <td colspan="2">
+                            <a ng-href="./#/triggers?tab=about&trigger={{trig.trigger_id}}" target="_blank">{{trig.name}}</a>
+                        </td>
+                        <td>
+                            Important
+                        </td>
+                        <td>
+                            {{trig.updated_at * 1000 | fromNow:prettyDate}}
+                        </td>
+
+
+                        <td class="actions">
+                            <span class="pe-7s-check" ng-click="show_ignore = true">
+                                <span
+                                    confirm-dialog show="show_ignore"
+                                    model="trig"
+                                    confirm="ignoreIssue"
+                                    cancel="closeIgnore"
+                                    title="Hide Trigger Notice"
+                                >
+                                    <p class="ignore" ng-if="show_ignore" ng-init="state.preventRefresh = true; trig.ignore_reason = ''; trig.ignore_period = 'week';">
+                                        Hide notice for:
+                                        <select ng-model="trig.ignore_period">
+                                            <option value="day">24 Hours</option>
+                                            <option value="three_days">3 days</option>
+                                            <option value="week">1 Week</option>
+                                            <option value="fortnight">A fortnight</option>
+                                            <option value="month">1 Month</option>
+                                        </select>
+                                        <br /><br />
+                                        Please leave a reason for hiding this notice:<br />
+                                        <textarea rows="5" ng-model="trig.ignore_reason"></textarea>
+                                    </p>
+                                </span>
+                            </span>
+                        </td>
+                    </tr>
+
+                    <tr class="trigger" ng-if="system.connection_issue">
+                        <td>
+                            Interface
+                        </td>
+                        <td colspan="2">
+                            {{system.installed_ui_devices}} device<span ng-show="system.installed_ui_devices > 0">s</span>,
+                            <span ng-if="system.num_connections > 0">{{system.num_connections}} currently</span>
+                            <span ng-if="system.num_connections == 0">none</span>
+                            connected
+                        </td>
+                        <td>
+                            Important
+                        </td>
+                        <td>
+                            
+                        </td>
+
+
+                        <td class="actions">
+                            <span class="pe-7s-check" ng-click="show_ignore = true">
+                                <span
+                                    confirm-dialog show="show_ignore"
+                                    model="system"
+                                    confirm="ignoreIssue"
+                                    cancel="closeIgnore"
+                                    title="Hide Interface Notice"
+                                >
+                                    <p class="ignore" ng-if="show_ignore" ng-init="state.preventRefresh = true; system.ignore_reason = ''; system.ignore_period = 'week';">
+                                        Hide notice for:
+                                        <select ng-model="system.ignore_period">
+                                            <option value="day">24 Hours</option>
+                                            <option value="three_days">3 days</option>
+                                            <option value="week">1 Week</option>
+                                            <option value="fortnight">A fortnight</option>
+                                            <option value="month">1 Month</option>
+                                        </select>
+                                        <br /><br />
+                                        Please leave a reason for hiding this notice:<br />
+                                        <textarea rows="5" ng-model="system.ignore_reason"></textarea>
+                                    </p>
+                                </span>
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="spacer"></div>
+        <div id="connections">
+            <h3>UI's Connected</h3>
+            <div>
+                
+            </div>
+        </div>
+        <div class="spacer"></div>
+        <div id="offline">
+            <h3>Devices Offline</h3>
+            <div>
+                
+            </div>
+        </div>
+        <div class="spacer"></div>
+        <div id="triggers">
+            <h3>Active Triggers</h3>
+            <div>
+                
+            </div>
+        </div>
+    </footer>
+
+
+    <script src="./dashboard/dashboard.js"></script>
+  </body>
+</html>

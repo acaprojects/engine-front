@@ -1,0 +1,45 @@
+<div ng-controller="DependenciesListCtrl" class="categories-wrapper">
+    <h1>Drivers
+        <span 
+            role="button"
+            ng-if="currentUser.sys_admin"
+            class="action"
+            ng-touch="state.show_new_dep = true">+
+            <span new-dep show="state.show_new_dep" on-create="newDepCB"></span>
+        </span>
+    </h1>
+    <div class="search">
+        <input 
+            ng-model="state.driverFilter"
+            placeholder="Filter Drivers"
+            type="text"
+
+            ng-touch="$event.stopPropagation()"
+            user-select="true" 
+            no-capture
+        >
+    </div>
+
+    <div
+        infinite-scroll="moreDependencys()"
+        infinite-scroll-disabled="dependenciesLoading"
+        infinite-scroll-distance="0.4"
+        infinite-scroll-container="'#sidescroll'"
+    >
+        <ul class="categories">
+            <li
+                ng-class="{selected: dependency.id === state.driver.id}"
+                ng-repeat="dependency in state.drivers | orderBy:'name' track by dependency.id"
+            >
+                <a goto="dependencies" search="{driver: dependency.id}" keep="driverFilter,tab" ng-click="state.driver = dependency">{{dependency.name}}</a>
+            </li>
+        </ul>
+
+        <!--
+            The loading spinner - showing whenever a request is being made
+         -->
+        <div ng-if="dependenciesLoading">
+            <div class="spinner"></div>
+        </div>
+    </div>
+</div>

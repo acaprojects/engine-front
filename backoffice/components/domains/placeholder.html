@@ -1,0 +1,9 @@
+<div class="view">
+    <div ng-if="state.domain">
+        <div ng-include="'components/domains/selected/domain.html'"></div>
+    </div>
+    <div ng-if="!state.domain" class="main">
+        <h1>No Domain Selected</h1>
+        <p class="no-content">Please select a domain from the sidebar</p>
+    </div>
+</div>

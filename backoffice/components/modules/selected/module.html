@@ -1,0 +1,116 @@
+<div class="main view" ng-controller="ModuleCtrl">
+    <h1>
+        <span ng-class="{online: module.connected, offline: !module.connected, paused: !module.running}">
+        </span>
+        <span>{{module.dependency.module_name}}</span> - 
+        <span>{{module.dependency.name}}</span>
+        <span class="indicators">
+            <span ng-if="module.tls" title="secure connection">&#xe63f;</span>
+            <span ng-if="module.udp" title="stateless (UDP)">&#xe650;</span>
+        </span>
+
+        <menu ng-if="currentUser.sys_admin">
+            <span role="button" class="pe-7s-pen"
+                edit-module show="show_module_edit"
+                module="state.module"
+                on-save="editModuleCB"
+                ng-touch="show_module_edit = true">
+            </span>
+            <span role="button" class="pe-7s-trash"
+                confirm-dialog show="confirm_module_delete"
+                model="state.module"
+                confirm="deleteModuleCB"
+                title="Delete Device"
+                ng-touch="confirm_module_delete = true"
+            >
+                <p>Deleting this device will immediately remove it from any systems it is within.</p>
+            </span>
+        </menu>
+    </h1>
+    <tabs current="state.tab" auto-select="false">
+
+        <pane icon="about" text="<span>About</span>" name="'about'">
+            <p ng-if="module.role === 3">
+                <b>Logic for System:</b> {{module.control_system.name}}
+                <br />
+                <br />
+            </p>
+            <p ng-if="module.role === 2">
+                <b>Service Endpoint:</b> {{module.uri}}
+                <br />
+                <br />
+            </p>
+            <p ng-if="module.role === 1">
+                {{module.ip}}:{{module.port}}
+                <br />
+                <br />
+            </p>
+            <p class="description cleanslate" markdown-to-html="module.notes || ''"></p>
+            <br />
+            <p class="description cleanslate" markdown-to-html="module.dependency.description || ''"></p>
+            <br />
+            <b>Settings</b> (including those inherited)
+            <p class="code" ng-bind-html="printSettings(settings) | newlines"></p>
+            <br />
+            <br />
+            <div ng-if="currentUser.sys_admin" ng-controller="ModuleTasksCtrl">
+                <button ng-if="!module.running" ng-click="startModule(module)">Start Device</button>
+                <button ng-if="module.running" ng-click="confirm_stop_module = true">Stop Device
+                    <span
+                        confirm-dialog show="confirm_stop_module"
+                        model="module"
+                        confirm="stopModule"
+                        title="Stop Device?"
+                    >
+                        <p>Are you sure you want to stop this module?<br />
+                        All Systems using this device will continue to run.</p>
+                    </span>
+                </button>
+            </div>
+        </pane>
+
+        <pane icon="systems" text="<span>Systems</span> ({{state.systems.length}})" name="'systems'">
+            <input 
+                ng-model="state.systemFilter"
+                placeholder="Filter Systems"
+                type="text"
+
+                ng-touch="$event.stopPropagation()"
+                user-select="true" 
+                no-capture
+            >
+            <table ng-show="state.systems.length > 0"
+                infinite-scroll="moreSystems()"
+                infinite-scroll-disabled="systemsLoading"
+                infinite-scroll-distance="0.4"
+            >
+                <tr>
+                    <th>Name</th>
+                    <th>No. Devices</th>
+                    <th>Created</th>
+                    <th ng-if="currentUser.sys_admin" class="remove" style="width: 7.5em;"></th>
+                </tr>
+                <tr ng-repeat="system in state.systems | orderBy:'name' track by system.id">
+                    <td><a goto="systems" search="{system: system.id}">{{system.name}} ({{system.id}})</a></td>
+                    <td>{{system.modules.length}}</td>
+                    <td>{{(system.created_at * 1000) | fromNow:prettyDate}}</td>
+                    <td ng-if="currentUser.sys_admin" class="remove">
+                        <button ng-if="module.role !== 3" ng-click="confirm_remove_system = true">
+                            Remove
+                            <span
+                                confirm-dialog show="confirm_remove_system"
+                                model="system"
+                                confirm="removeSystem"
+                                title="Remove System?"
+                            >
+                                <p>Remove device from '{{system.name}}'?<br />
+                                Configuration will be updated immediately.</p>
+                            </span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <p ng-if="state.systems.length == 0">No systems found. <span ng-if="state.systemFilter.length > 0">Try adjusting the filter</span></p>
+        </pane>
+    </tabs>
+</div>

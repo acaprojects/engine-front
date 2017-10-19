@@ -1,0 +1,181 @@
+<div class="main view" ng-controller="TriggerCtrl">
+    <h1>
+        {{state.trigger.name}}
+
+        <menu ng-if="currentUser.sys_admin">
+            <span role="button" class="pe-7s-pen"
+                edit-trigger show="show_trigger_edit"
+                trigger="state.trigger"
+                on-save="editTriggerCB"
+                ng-touch="show_trigger_edit = true">
+            </span>
+            <span role="button" class="pe-7s-trash"
+                confirm-dialog show="confirm_trigger_delete"
+                model="state.trigger"
+                confirm="deleteTriggerCB"
+                title="Delete Trigger?"
+                ng-touch="confirm_trigger_delete = true"
+            >
+                <p>Deleting this trigger will immediately remove it from all systems.</p>
+            </span>
+        </menu>
+    </h1>
+    <tabs current="state.tab" auto-select="false">
+        <pane icon="about" text="<span>About</span>" name="'about'">
+            <p class="description cleanslate" markdown-to-html="state.trigger.description || ''"></p>
+            <br />
+            <br />
+            <br />
+            <search-select model="state.sys_id" source="System" placeholder="to edit, select a template system"></search-select>
+            <br />
+            <b>Conditions</b>
+            <!-- New Condition -->
+            <span 
+                role="button" class="action"
+                ng-if="currentUser.sys_admin && view.system"
+                ng-touch="state.show_new_condition = true">+
+                <span edit-condition trigger="state.trigger" system="view.system" show="state.show_new_condition" on-save="editTriggerCB"></span>
+            </span>
+                <br />
+                <br />
+                <ul>
+                    <li style="margin-left: 23px;" ng-repeat="cond in state.trigger.conditions">
+                        <span class="code">
+                            <span ng-if="cond.length == 3">
+                                {{cond[0].mod}}_{{cond[0].index}}.{{cond[0].status}}<span ng-repeat="key in cond[0].keys">.{{key}}</span>
+                                <em>{{removeUnderscores(cond[1])}}</em>
+                                <span ng-if="cond[2].mod">{{cond[2].mod}}_{{cond[2].index}}.{{cond[2].status}}</span>
+                                <span ng-if="!cond[2].mod">{{cond[2].const}}</span>
+                            </span>
+                            <span ng-if="cond.length < 3">
+                                <span ng-if="cond[0] === 'cron'">{{convertCRON(cond[1].value)}}</span>
+                                <span ng-if="cond[0] === 'at'">{{showTime(cond[1].value)}}</span>
+                                <span ng-if="cond[0] === 'webhook'">webhook, payload {{cond[1].split('_').join(' ')}}</span>
+                            </span>
+                        </span>
+                        <span class="actions">
+                            <!-- EDIT Condition: -->
+                            <span role="button" title="edit" class="pe-7s-pen"
+                                ng-if="currentUser.sys_admin && view.system"
+                                ng-touch="show_edit_condition = true"
+                            >
+                                <span edit-condition trigger="state.trigger" system="view.system" index="$index" show="show_edit_condition" on-save="editTriggerCB"></span>
+                            </span>
+
+                            <!-- DELETE Condition: -->
+                            <span ng-if="currentUser.sys_admin"
+                                role="button" class="pe-7s-trash"
+                                confirm-dialog show="confirm_cond_delete"
+                                title="Delete Condition?"
+                                confirm="deleteCondition"
+                                model="$index"
+                                ng-touch="confirm_cond_delete = true"
+                            >
+                                <p>All systems using this trigger will be updated immediately.</p>
+                            </span>
+                        </span>
+                    </li>
+                </ul>
+                <br />
+                <br />
+
+            <b>Actions</b>
+            <!-- New Action -->
+            <span 
+                role="button" class="action"
+                ng-if="currentUser.sys_admin && view.system"
+                ng-touch="state.show_new_action = true">+
+                <span edit-action trigger="state.trigger" system="view.system" show="state.show_new_action" on-save="editTriggerCB"></span>
+            </span>
+                <br />
+                <br />
+                <span confirm-dialog show="state.confirm_action_order"
+                    model="state.trigger"
+                    confirm="updateActionOrder"
+                    cancel="undoOrder"
+                    title="Change Order?"
+                >
+                    <p>
+                        Are you sure you want to change action order?<br />
+                        Settings will be updated immediately for all systems.
+                    </p>
+                </span>
+                <ul ui-sortable="actionSortOptions" ng-model="state.trigger.actions">
+                    <li ng-repeat="action in state.trigger.actions">
+                        <span class="drag-handle"></span>
+                        <span class="code">
+                            <span ng-if="action.type == 'exec'">
+                                {{action.mod}}_{{action.index}}.{{action.func}} {{convertJSON(action.args)}}
+                            </span>
+                            <span ng-if="action.type == 'email'">
+                                Email: {{action.emails}}
+                            </span>
+                        </span>
+                        <span class="actions">
+                            <!-- EDIT Action: -->
+                            <span role="button" title="edit" class="pe-7s-pen"
+                                ng-if="currentUser.sys_admin && view.system"
+                                ng-touch="show_edit_action = true"
+                            >
+                                <span edit-action trigger="state.trigger" system="view.system" index="$index" show="show_edit_action" on-save="editTriggerCB"></span>
+                            </span>
+
+                            <!-- DELETE Action: -->
+                            <span ng-if="currentUser.sys_admin"
+                                role="button" class="pe-7s-trash"
+                                confirm-dialog show="confirm_act_delete"
+                                title="Delete Action?"
+                                confirm="deleteAction"
+                                model="$index"
+                                ng-touch="confirm_act_delete = true"
+                            >
+                                <p>All systems using this trigger will be updated immediately.</p>
+                            </span>
+                        </span>
+                    </li>
+                </ul>
+
+        </pane>
+
+        <pane icon="systems" text="<span>Systems</span> ({{systemtriggersTotal}})" name="'systems'">
+            <table ng-show="state.systems.length > 0"
+                infinite-scroll="moreSystems()"
+                infinite-scroll-disabled="systemsLoading"
+                infinite-scroll-distance="0.4"
+            >
+                <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>ID</th>
+                    <th>Added</th>
+                    <th ng-if="currentUser.sys_admin" class="remove" style="width: 7.5em;"></th>
+                </tr>
+                <tr ng-repeat="trig in state.systems track by trig.id">
+                    <td class="triggered">
+                        <div ng-class="{triggered: trig.triggered, inactive: !trig.triggered, paused: !trig.enabled}">
+                        </div>
+                        <span ng-show="trig.important" title="important"></span>
+                    </td>
+                    <td><a goto="systems" search="{system: trig.control_system.id, tab: 'triggers'}">{{trig.control_system.name}}</a></td>
+                    <td><a goto="systems" search="{system: trig.control_system.id, tab: 'triggers'}">{{trig.control_system.id}}</a></td>
+                    <td>{{(trig.created_at * 1000) | fromNow:prettyDate}}</td>
+                    <td ng-if="currentUser.sys_admin" class="remove">
+                        <button ng-click="confirm_remove_system = true">
+                            Remove
+                            <span
+                                confirm-dialog show="confirm_remove_system"
+                                model="system"
+                                confirm="removeSystem"
+                                title="Remove System?"
+                            >
+                                <p>Remove trigger from system '{{trig.control_system.name}}'?<br />
+                                New settings will be applied immediately.</p>
+                            </span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <p ng-if="state.systems.length == 0">No systems found. <span ng-if="state.systemFilter.length > 0">Try adjusting the filter</span></p>
+        </pane>
+    </tabs>
+</div>

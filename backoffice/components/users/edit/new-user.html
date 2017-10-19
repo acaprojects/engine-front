@@ -1,0 +1,24 @@
+<modal class="form" title="New User" show="show" visible="visible" no-close>
+    <div ng-if="visible">
+        <validated-form submit-fn="create" model="user">
+            <form-field model="name"></form-field>
+            <form-field model="email"></form-field>
+            <form-field model="card_number"></form-field>
+            <form-checkbox model="supervisor"></form-checkbox>
+            <form-checkbox model="student"></form-checkbox>
+            <form-checkbox model="support"></form-checkbox>
+            <form-checkbox model="sys_admin"></form-checkbox>
+
+            <form-field model="password"></form-field>
+            <form-field model="password_confirmation"></form-field>
+
+            <form-actions>
+                <form-submit>Create</form-submit>
+            </form-actions>
+        </validated-form>
+    </div>
+    <menu>
+        <button class="cancel" ng-touch="cancel()">Cancel</button>
+    </menu>
+    <div style="clear: both"></div>
+</div>

@@ -1,0 +1,35 @@
+CACHE MANIFEST
+#ver:2017-7-27 20:11:45
+#plugin:4.8.3
+
+CACHE:
+../main.52f17de1e2fbf7f4dd9b.bundle.js
+../polyfills.0886a496c9c14dc8d549.bundle.js
+../assets/html/cache-loader.html
+../assets/icon/apple-touch-icon-114x114.png
+../assets/icon/apple-touch-icon-120x120.png
+../assets/icon/apple-touch-icon-152x152.png
+../assets/icon/apple-touch-icon-144x144.png
+../assets/icon/apple-touch-icon-57x57.png
+../assets/icon/apple-touch-icon-60x60.png
+../assets/icon/apple-touch-icon-72x72.png
+../assets/icon/apple-touch-icon-76x76.png
+../assets/icon/code.txt
+../assets/icon/favicon-128.png
+../assets/icon/favicon-16x16.png
+../assets/icon/favicon-196x196.png
+../assets/icon/favicon-32x32.png
+../assets/icon/favicon-96x96.png
+../assets/icon/favicon.ico
+../assets/icon/mstile-144x144.png
+../assets/icon/mstile-150x150.png
+../assets/icon/mstile-310x150.png
+../assets/icon/mstile-70x70.png
+../assets/img/pwc_logo.png
+../assets/icon/mstile-310x310.png
+../assets/settings.json
+../oauth-resp.html
+../
+
+NETWORK:
+*

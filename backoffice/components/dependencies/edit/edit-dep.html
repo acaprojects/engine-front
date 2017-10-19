@@ -1,0 +1,24 @@
+<modal class="form" title="Edit Driver" show="show" visible="visible" no-close>
+    <div ng-if="visible">
+        <validated-form submit-fn="save" model="dep">
+            <form-field model="name"></form-field>
+            <form-text-area model="description"></form-text-area>
+            <form-field model="module_name"></form-field>
+            <div class="half-width">
+                <form-field model="default"></form-field>
+            </div>
+            <div class="half-width checkbox-padding">
+                <form-checkbox model="ignore_connected"></form-checkbox>
+            </div>
+            <div style="clear: both"></div>
+            <form-json-area model="settings"></form-json-area>
+            <form-actions>
+                <form-submit>Save</form-submit>
+            </form-actions>
+        </validated-form>
+    </div>
+    <menu>
+        <button class="cancel" ng-touch="cancel()">Cancel</button>
+    </menu>
+    <div style="clear: both"></div>
+</modal>
