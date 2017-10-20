@@ -36,9 +36,9 @@ components/zones/zones-list.html
 layout/select2/select2.css
 components/dependencies/edit/edit-dep.html
 components/dependencies/edit/new-dep.html
+components/dependencies/selected/dependency.html
 components/domains/apps/edit-app.html
 components/domains/apps/new-app.html
-components/dependencies/selected/dependency.html
 components/domains/auths/auth-form.html
 components/domains/auths/edit-auth.html
 components/domains/auths/new-auth.html
@@ -53,14 +53,14 @@ components/systems/edit/edit-system.html
 components/systems/edit/new-system.html
 components/systems/selected/system.html
 components/testing/selected/test.html
+components/triggers/selected/trigger.html
+components/users/edit/edit-user.html
+components/users/edit/new-user.html
 components/triggers/edit/edit-action.html
 components/triggers/edit/edit-condition.html
 components/triggers/edit/edit-trigger.html
 components/triggers/edit/new-trigger.html
-components/triggers/selected/trigger.html
 components/users/selected/user.html
-components/users/edit/edit-user.html
-components/users/edit/new-user.html
 components/zones/edit/edit-zone.html
 components/zones/edit/new-zone.html
 components/zones/selected/zone.html
@@ -70,4 +70,4 @@ http://*
 https://*
 *
 
-# hash: 4c908c82fd1d24e1bd36f483975ccf73e2a16ab7ca2b794a6327cd979c2140f4
+# hash: 50f3789ef1732490b43f680dd0e033cf35d1882732a404f6def85642f64395f2

@@ -57,7 +57,7 @@
         <form-field model="name_identifier_format" label="Name Identifier Format"></form-field>
     </div>
 
-    <form-json-area model="idp_sso_target_url_runtime_params" label="Claim Mappings"></form-json-area>
+    <form-json-area model="request_attributes"></form-json-area>
 
     <div class="half-width">
         <form-field model="assertion_consumer_service_url" label="Assertion URL"></form-field>
@@ -67,15 +67,21 @@
     </div>
 
     <div style="clear: both"></div>
+    
     <form-text-area model="idp_cert" label="Full Certificate"></form-text-area>
 
     <!-- Optional Settings -->
-    <form-field model="attribute_service_name" label="Attribute Service Name"></form-field>
+    <div class="half-width">
+        <form-field model="uid_attribute" label="UID Attribute"></form-field>
+    </div>
+    <div class="half-width">
+        <form-field model="attribute_service_name" label="Attribute Service Name"></form-field>
+    </div>
     <div class="half-width">
         <form-json-area model="attribute_statements"></form-json-area>
     </div>
     <div class="half-width">
-        <form-json-area model="request_attributes"></form-json-area>
+        <form-json-area model="idp_sso_target_url_runtime_params" label="Claim Mappings"></form-json-area>
     </div>
 
     <div class="half-width">
