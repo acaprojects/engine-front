@@ -66,17 +66,43 @@
                         All Systems using this device will continue to run.</p>
                     </span>
                 </button>
+                <button ng-if="!ping_state.pinging && module.role < 3" ng-click="ping(module)">Ping</button>
+
+                <div ng-if="!ping_state.pinging && ping_state.ping_results">
+                    <br />
+                    <br />
+                    <table>
+                        <tr>
+                            <td style="width: 7em">Pingable:</td>
+                            <td><b>{{ping_state.ping_results.pingable}}</b></td>
+                        </tr>
+                        <tr ng-if="ping_state.ping_results.host">
+                            <td>Host IP:</td>
+                            <td>{{ping_state.ping_results.host}}</td>
+                        </tr>
+                        <tr ng-if="ping_state.ping_results.exception">
+                            <td>Error:</td>
+                            <td>{{ping_state.ping_results.exception}}</td>
+                        </tr>
+                        <tr ng-if="ping_state.ping_results.warning">
+                            <td>Warning:</td>
+                            <td>{{ping_state.ping_results.warning}}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div ng-if="ping_state.pinging" class="spinner"></div>
             </div>
         </pane>
 
         <pane icon="systems" text="<span>Systems</span> ({{state.systems.length}})" name="'systems'">
-            <input 
+            <input
                 ng-model="state.systemFilter"
                 placeholder="Filter Systems"
                 type="text"
 
                 ng-touch="$event.stopPropagation()"
-                user-select="true" 
+                user-select="true"
                 no-capture
             >
             <table ng-show="state.systems.length > 0"
