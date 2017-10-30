@@ -5,9 +5,14 @@
             <h2>{{test.details.klass}}</h2>
 
             <table>
-                <tr ng-if="test.details.documentation">
+                <tr ng-if="test.details.documentation.length > 0">
                     <td>Reference Documentation</td>
-                    <td><a ng-href="{{test.details.documentation}}" target="_blank">{{test.details.documentation}}</a></td>
+                    <td>
+                        <span ng-repeat="doc in test.details.documentation track by $index">
+                            <a ng-href="{{doc}}" target="_blank">{{doc}}</a>
+                            <br />
+                        </span>
+                    </td>
                 </tr>
                 <tr ng-repeat="(key, value) in test.details.details">
                     <td>{{key.split('_').join(' ')}}</td>
