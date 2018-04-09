@@ -15,12 +15,12 @@ oauth-resp.html
 robots.txt
 styles.css
 dashboard/dashboard.js
-components/domains/domains-list.html
-components/domains/placeholder.html
 components/dependencies/dependencies-list.html
 components/dependencies/placeholder.html
 components/metrics/dials.html
 components/metrics/iframe.html
+components/domains/domains-list.html
+components/domains/placeholder.html
 components/modules/modules-list.html
 components/modules/placeholder.html
 components/systems/placeholder.html
@@ -34,17 +34,17 @@ components/users/users-list.html
 components/zones/placeholder.html
 components/zones/zones-list.html
 layout/select2/select2.css
+components/dependencies/edit/edit-dep.html
+components/dependencies/edit/new-dep.html
+components/dependencies/selected/dependency.html
 components/domains/apps/edit-app.html
 components/domains/apps/new-app.html
-components/domains/edit/edit-domain.html
-components/domains/edit/new-domain.html
 components/domains/auths/auth-form.html
 components/domains/auths/edit-auth.html
 components/domains/auths/new-auth.html
+components/domains/edit/edit-domain.html
+components/domains/edit/new-domain.html
 components/domains/selected/domain.html
-components/dependencies/selected/dependency.html
-components/dependencies/edit/edit-dep.html
-components/dependencies/edit/new-dep.html
 components/modules/edit/edit-module.html
 components/modules/edit/new-module.html
 components/modules/selected/module.html
@@ -53,11 +53,11 @@ components/systems/edit/edit-system.html
 components/systems/edit/new-system.html
 components/systems/selected/system.html
 components/testing/selected/test.html
-components/triggers/selected/trigger.html
 components/triggers/edit/edit-action.html
 components/triggers/edit/edit-condition.html
 components/triggers/edit/edit-trigger.html
 components/triggers/edit/new-trigger.html
+components/triggers/selected/trigger.html
 components/users/edit/edit-user.html
 components/users/edit/new-user.html
 components/users/selected/user.html
@@ -70,4 +70,4 @@ http://*
 https://*
 *
 
-# hash: 2fa7d79bfa046855aff5bdc8d1d9a394b6272c1e78ec1f82f6c2262c81ae9367
+# hash: 25afb70f0aaf1c46b6eb5947ea5736fb06436da5f9ad7c11d283e08d6f7cad14

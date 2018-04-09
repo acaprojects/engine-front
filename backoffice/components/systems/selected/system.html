@@ -36,32 +36,6 @@
                 </span>
             </p>
             <br />
-            <b>Execute Command</b>
-            <p ng-touch="$event.stopPropagation()" user-select="true" no-capture>
-                <select
-                    ng-model="view.cmd.module_selected"
-                    ng-options="key as mod.display for (key, mod) in view.accessors"
-                >
-                    <option value="">select a device</option>
-                </select>
-                <select
-                    ng-if="view.cmd.func_list"
-                    ng-model="view.cmd.func"
-                    ng-options="func for func in view.cmd.func_list"
-                >
-                    <option value="">select a function</option>
-                </select>
-                <span ng-if="view.cmd.func">
-                    (<input ng-if="view.cmd.placeholder.length > 0" placeholder="{{view.cmd.placeholder}}" type="text" ng-model="view.cmd.func_args"></input>)
-                    <button ng-click="exec_cmd()" ng-if="view.cmd.valid_args">Send</button>
-                </span>
-            </p>
-            <br />
-            <p class="description cleanslate" markdown-to-html="system.description || ''"></p>
-            <br />
-            <b>Settings</b> (including those inherited from zones)
-            <p class="code" ng-bind-html="printSettings(view.allSettings) | newlines"></p>
-            <br />
             <br />
             <button ng-if="currentUser.sys_admin" ng-click="confirm_system_start = true">
                 Start System
@@ -90,6 +64,35 @@
             <button ng-if="currentUser.sys_admin" ng-click="request_access_logs()">
                 Access Logs
             </button>
+            <br />
+            <br />
+            <br />
+            <b>Execute Command</b>
+            <p ng-touch="$event.stopPropagation()" user-select="true" no-capture>
+                <select
+                    ng-model="view.cmd.module_selected"
+                    ng-options="key as mod.display for (key, mod) in view.accessors"
+                >
+                    <option value="">select a device</option>
+                </select>
+                <select
+                    ng-if="view.cmd.func_list"
+                    ng-model="view.cmd.func"
+                    ng-options="func for func in view.cmd.func_list"
+                >
+                    <option value="">select a function</option>
+                </select>
+                <span ng-if="view.cmd.func">
+                    (<input ng-if="view.cmd.placeholder.length > 0" placeholder="{{view.cmd.placeholder}}" type="text" ng-model="view.cmd.func_args"></input>)
+                    <button ng-click="exec_cmd()" ng-if="view.cmd.valid_args">Send</button>
+                </span>
+            </p>
+            <br />
+            <p class="description cleanslate" markdown-to-html="system.description || ''"></p>
+            <br />
+            <b>Settings</b> (including those inherited from zones)
+            <p class="code" ng-bind-html="printSettings(view.allSettings) | newlines"></p>
+            <br />
         </pane>
 
         <pane icon="modules" text="<span>Devices</span> ({{view.modules.length}})" name="'devices'">
@@ -241,19 +244,22 @@
                         </div>
                     </td>
                     <td class="drag-keep">
-                        <span class="indicators">
-                            <span ng-if="!module.running" ng-click="startModule(module)">&#xe624;</span>
-                            <span ng-if="module.running" ng-click="stopModule(module)">&#xe621;</span>
-                        </span>
-                        <a goto="modules" search="{module: module.id}">{{module.dependency.name}}</a>
-                        <span class="indicators" ng-click="dump_state(module)">&#xe63e;</span>
+                        <div class="dev-container" style="height:100%;">
+                            <span class="indicators">
+                                <span ng-if="!module.running" ng-click="startModule(module)">&#xe624;</span>
+                                <span ng-if="module.running" ng-click="stopModule(module)">&#xe621;</span>
+                            </span>
+                            <a goto="modules" search="{module: module.id}">{{module.dependency.name}}</a>
+                            <div class="dev-notes">{{module.notes}}</div>
+                            <span class="indicators" ng-click="dump_state(module)">&#xe63e;</span>
+                        </div>
                     </td>
                     <td>
                         <span>
                             <input type="checkbox" ng-model="debug">
                             <span ng-if="debug" co-debug></span>
                         </span>
-                        {{module.custom_name || module.dependency.module_name}}
+                        {{module.module_name_count}}
                         <span style="float:right; margin-right:6px" ng-if="currentUser.sys_admin" ng-click="confirm_reload_dep = true">
                             <span class="indicators">&#xe61c;</span>
                             <span
