@@ -1,7 +1,12 @@
 <modal class="form" title="New Zone" show="show" visible="visible" no-close>
     <div ng-if="visible">
         <validated-form submit-fn="create" model="zone">
-            <form-field model="name"></form-field>
+            <div class="half-width">
+                <form-field model="name"></form-field>
+            </div>
+            <div class="half-width">
+                <form-field model="tags"></form-field>
+            </div>
             <form-text-area model="description"></form-text-area>
             <form-json-area model="settings"></form-json-area>
             <form-actions>

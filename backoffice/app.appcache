@@ -17,10 +17,10 @@ styles.css
 dashboard/dashboard.js
 components/dependencies/dependencies-list.html
 components/dependencies/placeholder.html
-components/metrics/dials.html
-components/metrics/iframe.html
 components/domains/domains-list.html
 components/domains/placeholder.html
+components/metrics/dials.html
+components/metrics/iframe.html
 components/modules/modules-list.html
 components/modules/placeholder.html
 components/systems/placeholder.html
@@ -47,10 +47,10 @@ components/domains/edit/new-domain.html
 components/domains/selected/domain.html
 components/modules/edit/edit-module.html
 components/modules/edit/new-module.html
-components/modules/selected/module.html
 components/systems/edit/edit-sys-trig.html
 components/systems/edit/edit-system.html
 components/systems/edit/new-system.html
+components/modules/selected/module.html
 components/systems/selected/system.html
 components/testing/selected/test.html
 components/triggers/edit/edit-action.html
@@ -70,4 +70,4 @@ http://*
 https://*
 *
 
-# hash: 25afb70f0aaf1c46b6eb5947ea5736fb06436da5f9ad7c11d283e08d6f7cad14
+# hash: 62358d4ae1c35e18f325e92d0d18fa9730e95ea5f61f58fe6d00217f32bbfb7d
